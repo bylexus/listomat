@@ -1,0 +1,41 @@
+{
+  "name": "packliste",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx server/db/seed.ts"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.17.4",
+    "@nuxtjs/i18n": "^10.5.0",
+    "@primevue/nuxt-module": "^5.0.0",
+    "@primevue/themes": "^4.5.4",
+    "bcrypt": "^6.0.0",
+    "drizzle-orm": "^0.45.2",
+    "nuxt": "^4.5.0",
+    "nuxt-auth-utils": "^0.5.29",
+    "primeicons": "^8.0.0",
+    "primevue": "^5.0.0",
+    "uuidv7": "^1.2.1",
+    "vue": "^3.5.40",
+    "vue-draggable-plus": "^0.6.1",
+    "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "drizzle-kit": "^0.31.10"
+  },
+  "allowScripts": {
+    "bcrypt@6.0.0": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.1": true,
+    "esbuild@0.18.20": true
+  }
+}

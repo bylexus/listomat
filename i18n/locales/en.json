@@ -1,0 +1,11 @@
+{
+  "app": {
+    "title": "Packing Lists"
+  },
+  "nav": {
+    "lists": "Lists",
+    "templates": "Templates",
+    "admin": "Administration",
+    "logout": "Logout"
+  }
+}

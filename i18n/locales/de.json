@@ -1,0 +1,11 @@
+{
+  "app": {
+    "title": "Packlisten"
+  },
+  "nav": {
+    "lists": "Listen",
+    "templates": "Vorlagen",
+    "admin": "Administration",
+    "logout": "Abmelden"
+  }
+}
