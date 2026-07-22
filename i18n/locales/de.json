@@ -7,5 +7,11 @@
     "templates": "Vorlagen",
     "admin": "Administration",
     "logout": "Abmelden"
+  },
+  "auth": {
+    "email": "E-Mail",
+    "password": "Passwort",
+    "login": "Anmelden",
+    "invalidCredentials": "E-Mail oder Passwort falsch"
   }
 }

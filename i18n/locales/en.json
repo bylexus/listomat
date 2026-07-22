@@ -7,5 +7,11 @@
     "templates": "Templates",
     "admin": "Administration",
     "logout": "Logout"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "login": "Log in",
+    "invalidCredentials": "Invalid email or password"
   }
 }

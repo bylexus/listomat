@@ -2,11 +2,12 @@
   <div class="app-shell">
     <header class="app-header">
       <span class="app-title">{{ t('app.title') }}</span>
-      <nav class="app-nav">
+      <nav v-if="loggedIn" class="app-nav">
         <NuxtLink to="/">{{ t('nav.lists') }}</NuxtLink>
         <NuxtLink to="/templates">{{ t('nav.templates') }}</NuxtLink>
-        <NuxtLink to="/admin/users">{{ t('nav.admin') }}</NuxtLink>
+        <NuxtLink v-if="user?.role === 'admin'" to="/admin/users">{{ t('nav.admin') }}</NuxtLink>
       </nav>
+      <div v-else class="app-nav" />
       <div class="app-lang">
         <Select
           v-model="locale"
@@ -14,6 +15,7 @@
           option-label="name"
           option-value="code"
         />
+        <Button v-if="loggedIn" :label="t('nav.logout')" severity="secondary" text @click="logout" />
       </div>
     </header>
     <main class="app-main">
@@ -25,6 +27,12 @@
 <script setup lang="ts">
 const { t, locale, locales } = useI18n()
 const availableLocales = computed(() => locales.value)
+const { loggedIn, user, clear } = useUserSession()
+
+async function logout() {
+  await clear()
+  await navigateTo('/login')
+}
 </script>
 
 <style scoped>
