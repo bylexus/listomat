@@ -1,5 +1,10 @@
 <template>
   <div class="app-shell">
+    <Toast />
+    <div v-if="session?.impersonatedBy" class="impersonation-banner">
+      <span>{{ t('admin.impersonating', { name: `${user?.firstName} ${user?.lastName}` }) }}</span>
+      <Button :label="t('admin.backToAdmin')" size="small" severity="contrast" @click="stopImpersonation" />
+    </div>
     <header class="app-header">
       <span class="app-title">{{ t('app.title') }}</span>
       <nav v-if="loggedIn" class="app-nav">
@@ -27,11 +32,18 @@
 <script setup lang="ts">
 const { t, locale, locales } = useI18n()
 const availableLocales = computed(() => locales.value)
-const { loggedIn, user, clear } = useUserSession()
+const { loggedIn, user, session, clear, fetch: refreshSession } = useUserSession()
+const { call } = useApi()
 
 async function logout() {
   await clear()
   await navigateTo('/login')
+}
+
+async function stopImpersonation() {
+  await call(() => $fetch('/api/admin/impersonate/stop', { method: 'POST' }))
+  await refreshSession()
+  await navigateTo('/admin/users')
 }
 </script>
 
@@ -60,5 +72,15 @@ async function logout() {
 }
 .app-main {
   padding: 1rem;
+}
+.impersonation-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.9rem;
 }
 </style>

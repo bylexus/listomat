@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     role: dbUser.role
   }
 
-  await replaceUserSession(event, { user: sessionUser })
+  await replaceUserSession(event, { user: sessionUser, impersonatedBy: undefined })
 
   return { user: sessionUser }
 })

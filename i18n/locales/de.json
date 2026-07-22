@@ -13,5 +13,35 @@
     "password": "Passwort",
     "login": "Anmelden",
     "invalidCredentials": "E-Mail oder Passwort falsch"
+  },
+  "errors": {
+    "title": "Fehler",
+    "generic": "Etwas ist schiefgelaufen"
+  },
+  "admin": {
+    "newUser": "Neuer Benutzer",
+    "editUser": "Benutzer bearbeiten",
+    "email": "E-Mail",
+    "firstName": "Vorname",
+    "lastName": "Name",
+    "role": "Rolle",
+    "roleAdmin": "Admin",
+    "roleUser": "Benutzer",
+    "active": "Aktiv",
+    "activeYes": "Aktiv",
+    "activeNo": "Inaktiv",
+    "lastLogin": "Letzter Login",
+    "actions": "Aktionen",
+    "password": "Passwort",
+    "newPassword": "Neues Passwort",
+    "setPassword": "Passwort setzen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "userCreated": "Benutzer angelegt",
+    "userUpdated": "Benutzer aktualisiert",
+    "passwordSet": "Passwort gesetzt",
+    "impersonate": "Anmelden als",
+    "impersonating": "Angemeldet als {name}",
+    "backToAdmin": "Zurück zu Admin"
   }
 }

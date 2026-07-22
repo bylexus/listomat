@@ -13,5 +13,35 @@
     "password": "Password",
     "login": "Log in",
     "invalidCredentials": "Invalid email or password"
+  },
+  "errors": {
+    "title": "Error",
+    "generic": "Something went wrong"
+  },
+  "admin": {
+    "newUser": "New user",
+    "editUser": "Edit user",
+    "email": "Email",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "role": "Role",
+    "roleAdmin": "Admin",
+    "roleUser": "User",
+    "active": "Active",
+    "activeYes": "Active",
+    "activeNo": "Inactive",
+    "lastLogin": "Last login",
+    "actions": "Actions",
+    "password": "Password",
+    "newPassword": "New password",
+    "setPassword": "Set password",
+    "cancel": "Cancel",
+    "save": "Save",
+    "userCreated": "User created",
+    "userUpdated": "User updated",
+    "passwordSet": "Password set",
+    "impersonate": "Log in as",
+    "impersonating": "Logged in as {name}",
+    "backToAdmin": "Back to admin"
   }
 }
