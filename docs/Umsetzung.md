@@ -332,15 +332,15 @@ Pro Etappe: umsetzen, dann stoppen. Der Entwickler prüft manuell anhand der Pr�
 nuxi init, Git, Dependencies (@nuxtjs/i18n, drizzle-orm, drizzle-kit, @libsql/client, uuidv7, bcrypt, nuxt-auth-utils, vue-draggable-plus), Ordnerstruktur, i18n-Grundgerüst (de/en), Basis-Layout mit Menü.
 Prüfpunkte: `npm run dev` läuft, Sprachumschaltung wirkt.
 
-**E2 – Schema, Migrationen, Seed**
+**E2 – Schema, Migrationen, Seed** *(erledigt)*
 schema.ts wie oben, drizzle.config, erste Migration generieren + ausführen, Seed-Script.
 Prüfpunkte: `data/app.db` entsteht, Tabellen vorhanden, Admin-User in DB.
 
-**E3 – Auth**
+**E3 – Auth** *(erledigt)*
 Login/Logout/me-Routen, Session, Login-Seite, globale Middleware, requireUser/requireAdmin.
 Prüfpunkte: Login mit admin/admin funktioniert, geschützte Seite leitet ohne Session auf /login um, Logout wirkt.
 
-**E3b – PrimeVue-Ausbau (Migration, nächste Etappe)**
+**E3b – PrimeVue-Ausbau (Migration)** *(erledigt)*
 E1–E3 wurden mit PrimeVue gebaut; PrimeVue wird jetzt entfernt. Vorgehen in dieser Reihenfolge:
 1. Inventar: `grep -ri "primevue\|primeicons\|p-" app/ nuxt.config.ts` – alle Verwendungen auflisten (Komponenten, Icon-Klassen, Theme).
 2. Dependencies entfernen: `npm remove primevue primeicons` sowie ggf. `@primevue/nuxt-module` bzw. `@primevue/themes` (alles entfernen, was im `package.json` zu PrimeVue gehört).
@@ -351,15 +351,15 @@ E1–E3 wurden mit PrimeVue gebaut; PrimeVue wird jetzt entfernt. Vorgehen in di
 
 Prüfpunkte: `grep -ri primevue app/ server/ nuxt.config.ts package.json` liefert nichts; `npm run dev` läuft ohne Fehler; Login/Logout funktionieren unverändert; fehlgeschlagener Login zeigt Toast; Sprachumschaltung wirkt; Redirect-Verhalten aus E3 unverändert.
 
-**E4 – Admin-Userverwaltung + Impersonation**
+**E4 – Admin-Userverwaltung + Impersonation** *(erledigt)*
 Admin-Routen + Admin-Seite, Impersonation inkl. Banner.
 Prüfpunkte: User anlegen, bearbeiten, deaktivieren (Login dann unmöglich), Passwort setzen, impersonate + zurück.
 
-**E5 – Vorlagen-Verwaltung**
+**E5 – Vorlagen-Verwaltung** *(erledigt; zusätzlich globale API-Auth-Middleware, siehe Entscheide «API-Security»)*
 Template-Routen + Seite, CRUD Gruppen/Einträge, DnD-Sortierung, Neunummerierung.
 Prüfpunkte: Vorlagen-CRUD komplett, Sortierung überlebt Reload, fremde Vorlagen unsichtbar (mit 2. User testen).
 
-**E6 – Listen: Übersicht + CRUD**
+**E6 – Listen: Übersicht + CRUD** *(nächste Etappe)*
 GET/POST/PATCH/DELETE /api/lists, Übersichtsseite mit Kacheln + Fortschritt, Liste anlegen (öffnet direkt Detail), löschen mit Bestätigung.
 Prüfpunkte: Liste anlegen/umbenennen/löschen, Kachel zeigt Fortschritt 0/0.
 
