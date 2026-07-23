@@ -3,6 +3,12 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
+  app: {
+    head: {
+      title: 'Listomat'
+    }
+  },
+
   modules: ['@nuxtjs/i18n', 'nuxt-auth-utils'],
 
   css: ['~/assets/css/main.css'],
