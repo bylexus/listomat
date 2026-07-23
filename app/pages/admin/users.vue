@@ -1,97 +1,142 @@
 <template>
   <div>
-    <div class="page-header">
+    <div class="page-header toolbar">
       <h1>{{ t('nav.admin') }}</h1>
-      <Button :label="t('admin.newUser')" icon="pi pi-plus" @click="openCreate" />
+      <button class="btn btn-primary" type="button" @click="openCreate">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+        </svg>
+        {{ t('admin.newUser') }}
+      </button>
     </div>
 
-    <DataTable :value="userList" data-key="id" :loading="loading">
-      <Column field="email" :header="t('admin.email')" />
-      <Column :header="t('admin.firstName') + ' / ' + t('admin.lastName')">
-        <template #body="{ data }">{{ data.firstName }} {{ data.lastName }}</template>
-      </Column>
-      <Column :header="t('admin.role')">
-        <template #body="{ data }">{{ data.role === 'admin' ? t('admin.roleAdmin') : t('admin.roleUser') }}</template>
-      </Column>
-      <Column :header="t('admin.active')">
-        <template #body="{ data }">
-          <Tag :severity="data.active ? 'success' : 'danger'" :value="data.active ? t('admin.activeYes') : t('admin.activeNo')" />
-        </template>
-      </Column>
-      <Column :header="t('admin.lastLogin')">
-        <template #body="{ data }">{{ formatDate(data.lastLoginAt) }}</template>
-      </Column>
-      <Column :header="t('admin.actions')">
-        <template #body="{ data }">
-          <div class="row-actions">
-            <Button icon="pi pi-pencil" text rounded :title="t('admin.editUser')" @click="openEdit(data)" />
-            <Button
-              :icon="data.active ? 'pi pi-ban' : 'pi pi-check'"
-              text
-              rounded
-              :disabled="data.id === currentUser?.id"
-              :title="data.active ? t('admin.activeNo') : t('admin.activeYes')"
-              @click="toggleActive(data)"
-            />
-            <Button icon="pi pi-key" text rounded :title="t('admin.setPassword')" @click="openPassword(data)" />
-            <Button
-              icon="pi pi-user"
-              text
-              rounded
-              :disabled="data.id === currentUser?.id || !data.active"
-              :title="t('admin.impersonate')"
-              @click="impersonate(data)"
-            />
-          </div>
-        </template>
-      </Column>
-    </DataTable>
+    <div class="card table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ t('admin.email') }}</th>
+            <th>{{ t('admin.firstName') }} / {{ t('admin.lastName') }}</th>
+            <th>{{ t('admin.role') }}</th>
+            <th>{{ t('admin.active') }}</th>
+            <th>{{ t('admin.lastLogin') }}</th>
+            <th>{{ t('admin.actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="loading">
+            <td colspan="6">…</td>
+          </tr>
+          <tr v-for="row in userList" v-else :key="row.id">
+            <td>{{ row.email }}</td>
+            <td>{{ row.firstName }} {{ row.lastName }}</td>
+            <td>{{ row.role === 'admin' ? t('admin.roleAdmin') : t('admin.roleUser') }}</td>
+            <td>
+              <span class="badge" :class="row.active ? 'badge-success' : 'badge-danger'">
+                {{ row.active ? t('admin.activeYes') : t('admin.activeNo') }}
+              </span>
+            </td>
+            <td>{{ formatDate(row.lastLoginAt) }}</td>
+            <td>
+              <div class="row-actions">
+                <button class="btn btn-ghost" type="button" :title="t('admin.editUser')" @click="openEdit(row)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                      d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+                <button
+                  class="btn btn-ghost"
+                  type="button"
+                  :disabled="row.id === currentUser?.id"
+                  :title="row.active ? t('admin.activeNo') : t('admin.activeYes')"
+                  @click="toggleActive(row)"
+                >
+                  <svg
+                    v-if="row.active"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M4.9 4.9l14.2 14.2" stroke-linecap="round" />
+                  </svg>
+                  <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+                <button class="btn btn-ghost" type="button" :title="t('admin.setPassword')" @click="openPassword(row)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="8" cy="15" r="4" />
+                    <path d="M10.5 12.5 20 3M17 6l2 2M14 9l2 2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  class="btn btn-ghost"
+                  type="button"
+                  :disabled="row.id === currentUser?.id || !row.active"
+                  :title="t('admin.impersonate')"
+                  @click="impersonate(row)"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke-linecap="round" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <Dialog v-model:visible="editDialogVisible" modal :header="editingId ? t('admin.editUser') : t('admin.newUser')" style="width: 420px">
-      <div class="dialog-form">
-        <div class="field">
-          <label for="f-email">{{ t('admin.email') }}</label>
-          <InputText id="f-email" v-model="form.email" />
-        </div>
-        <div class="field">
-          <label for="f-first">{{ t('admin.firstName') }}</label>
-          <InputText id="f-first" v-model="form.firstName" />
-        </div>
-        <div class="field">
-          <label for="f-last">{{ t('admin.lastName') }}</label>
-          <InputText id="f-last" v-model="form.lastName" />
-        </div>
-        <div v-if="!editingId" class="field">
-          <label for="f-pw">{{ t('admin.password') }}</label>
-          <Password id="f-pw" v-model="form.password" :feedback="false" toggle-mask />
-        </div>
-        <div v-if="editingId" class="field">
-          <label for="f-role">{{ t('admin.role') }}</label>
-          <Select
-            id="f-role"
-            v-model="form.role"
-            :options="[{ label: t('admin.roleUser'), value: 'user' }, { label: t('admin.roleAdmin'), value: 'admin' }]"
-            option-label="label"
-            option-value="value"
-          />
-        </div>
+    <UiModal :open="editDialogVisible" @close="editDialogVisible = false">
+      <template #header>{{ editingId ? t('admin.editUser') : t('admin.newUser') }}</template>
+      <div class="form-field">
+        <label for="f-email">{{ t('admin.email') }}</label>
+        <input id="f-email" v-model="form.email" type="email" />
+      </div>
+      <div class="form-field">
+        <label for="f-first">{{ t('admin.firstName') }}</label>
+        <input id="f-first" v-model="form.firstName" type="text" />
+      </div>
+      <div class="form-field">
+        <label for="f-last">{{ t('admin.lastName') }}</label>
+        <input id="f-last" v-model="form.lastName" type="text" />
+      </div>
+      <div v-if="!editingId" class="form-field">
+        <label for="f-pw">{{ t('admin.password') }}</label>
+        <input id="f-pw" v-model="form.password" type="password" />
+      </div>
+      <div v-if="editingId" class="form-field">
+        <label for="f-role">{{ t('admin.role') }}</label>
+        <select id="f-role" v-model="form.role">
+          <option value="user">{{ t('admin.roleUser') }}</option>
+          <option value="admin">{{ t('admin.roleAdmin') }}</option>
+        </select>
       </div>
       <template #footer>
-        <Button :label="t('admin.cancel')" severity="secondary" text @click="editDialogVisible = false" />
-        <Button :label="t('admin.save')" :loading="saving" @click="saveUser" />
+        <button class="btn" type="button" @click="editDialogVisible = false">{{ t('admin.cancel') }}</button>
+        <button class="btn btn-primary" type="button" :disabled="saving" @click="saveUser">{{ t('admin.save') }}</button>
       </template>
-    </Dialog>
+    </UiModal>
 
-    <Dialog v-model:visible="passwordDialogVisible" modal :header="t('admin.setPassword')" style="width: 380px">
-      <div class="field">
+    <UiModal :open="passwordDialogVisible" @close="passwordDialogVisible = false">
+      <template #header>{{ t('admin.setPassword') }}</template>
+      <div class="form-field">
         <label for="f-newpw">{{ t('admin.newPassword') }}</label>
-        <Password id="f-newpw" v-model="newPassword" :feedback="false" toggle-mask />
+        <input id="f-newpw" v-model="newPassword" type="password" />
       </div>
       <template #footer>
-        <Button :label="t('admin.cancel')" severity="secondary" text @click="passwordDialogVisible = false" />
-        <Button :label="t('admin.save')" :loading="saving" @click="savePassword" />
+        <button class="btn" type="button" @click="passwordDialogVisible = false">{{ t('admin.cancel') }}</button>
+        <button class="btn btn-primary" type="button" :disabled="saving" @click="savePassword">{{ t('admin.save') }}</button>
       </template>
-    </Dialog>
+    </UiModal>
   </div>
 </template>
 
@@ -159,22 +204,26 @@ function openEdit(data: AdminUser) {
 async function saveUser() {
   saving.value = true
   if (editingId.value) {
-    const result = await call(() => $fetch(`/api/admin/users/${editingId.value}`, {
-      method: 'PATCH',
-      body: { email: form.email, firstName: form.firstName, lastName: form.lastName, role: form.role }
-    }))
+    const result = await call(() =>
+      $fetch(`/api/admin/users/${editingId.value}`, {
+        method: 'PATCH',
+        body: { email: form.email, firstName: form.firstName, lastName: form.lastName, role: form.role }
+      })
+    )
     if (result) {
-      toast.add({ severity: 'success', summary: t('admin.userUpdated'), life: 3000 })
+      toast.add({ severity: 'success', summary: t('admin.userUpdated') })
       editDialogVisible.value = false
       await loadUsers()
     }
   } else {
-    const result = await call(() => $fetch('/api/admin/users', {
-      method: 'POST',
-      body: { email: form.email, firstName: form.firstName, lastName: form.lastName, password: form.password }
-    }))
+    const result = await call(() =>
+      $fetch('/api/admin/users', {
+        method: 'POST',
+        body: { email: form.email, firstName: form.firstName, lastName: form.lastName, password: form.password }
+      })
+    )
     if (result) {
-      toast.add({ severity: 'success', summary: t('admin.userCreated'), life: 3000 })
+      toast.add({ severity: 'success', summary: t('admin.userCreated') })
       editDialogVisible.value = false
       await loadUsers()
     }
@@ -183,12 +232,14 @@ async function saveUser() {
 }
 
 async function toggleActive(data: AdminUser) {
-  const result = await call(() => $fetch(`/api/admin/users/${data.id}`, {
-    method: 'PATCH',
-    body: { active: !data.active }
-  }))
+  const result = await call(() =>
+    $fetch(`/api/admin/users/${data.id}`, {
+      method: 'PATCH',
+      body: { active: !data.active }
+    })
+  )
   if (result) {
-    toast.add({ severity: 'success', summary: t('admin.userUpdated'), life: 3000 })
+    toast.add({ severity: 'success', summary: t('admin.userUpdated') })
     await loadUsers()
   }
 }
@@ -202,22 +253,26 @@ function openPassword(data: AdminUser) {
 async function savePassword() {
   if (!passwordTargetId.value) return
   saving.value = true
-  const result = await call(() => $fetch(`/api/admin/users/${passwordTargetId.value}`, {
-    method: 'PATCH',
-    body: { password: newPassword.value }
-  }))
+  const result = await call(() =>
+    $fetch(`/api/admin/users/${passwordTargetId.value}`, {
+      method: 'PATCH',
+      body: { password: newPassword.value }
+    })
+  )
   if (result) {
-    toast.add({ severity: 'success', summary: t('admin.passwordSet'), life: 3000 })
+    toast.add({ severity: 'success', summary: t('admin.passwordSet') })
     passwordDialogVisible.value = false
   }
   saving.value = false
 }
 
 async function impersonate(data: AdminUser) {
-  const result = await call(() => $fetch('/api/admin/impersonate', {
-    method: 'POST',
-    body: { userId: data.id }
-  }))
+  const result = await call(() =>
+    $fetch('/api/admin/impersonate', {
+      method: 'POST',
+      body: { userId: data.id }
+    })
+  )
   if (result) {
     await refreshSession()
     await navigateTo('/')
@@ -229,23 +284,32 @@ onMounted(loadUsers)
 
 <style scoped>
 .page-header {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
   margin-bottom: 1rem;
+}
+.table-card {
+  padding: 0;
+  overflow-x: auto;
+}
+.table-card table {
+  min-width: 640px;
 }
 .row-actions {
   display: flex;
   gap: 0.25rem;
 }
-.dialog-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
 }
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+.badge-success {
+  background: var(--color-success);
+}
+.badge-danger {
+  background: var(--color-danger);
 }
 </style>

@@ -1,8 +1,7 @@
 <template>
   <div>
     <h1>{{ t('nav.lists') }}</h1>
-    <p>E1: Projekt-Setup. PrimeVue-Button und Sprachumschaltung testen.</p>
-    <Button :label="t('nav.lists')" icon="pi pi-check" />
+    <p>{{ t('nav.lists') }} folgen in E6.</p>
   </div>
 </template>
 

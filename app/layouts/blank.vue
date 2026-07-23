@@ -1,5 +1,6 @@
 <template>
   <div class="blank-shell">
+    <UiToasts />
     <slot />
   </div>
 </template>

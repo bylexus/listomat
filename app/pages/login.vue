@@ -1,21 +1,20 @@
 <template>
-  <Card style="width: 100%; max-width: 380px">
-    <template #title>{{ t('app.title') }}</template>
-    <template #content>
-      <form class="login-form" @submit.prevent="onSubmit">
-        <div class="field">
-          <label for="email">{{ t('auth.email') }}</label>
-          <InputText id="email" v-model="email" type="email" autocomplete="username" />
-        </div>
-        <div class="field">
-          <label for="password">{{ t('auth.password') }}</label>
-          <Password id="password" v-model="password" :feedback="false" toggle-mask autocomplete="current-password" />
-        </div>
-        <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
-        <Button type="submit" :label="t('auth.login')" :loading="loading" class="submit-btn" />
-      </form>
-    </template>
-  </Card>
+  <div class="card login-card">
+    <h1>{{ t('app.title') }}</h1>
+    <form class="login-form" @submit.prevent="onSubmit">
+      <div class="form-field">
+        <label for="email">{{ t('auth.email') }}</label>
+        <input id="email" v-model="email" type="email" autocomplete="username" required />
+      </div>
+      <div class="form-field">
+        <label for="password">{{ t('auth.password') }}</label>
+        <input id="password" v-model="password" type="password" autocomplete="current-password" required />
+      </div>
+      <button class="btn btn-primary submit-btn" type="submit" :disabled="loading">
+        {{ t('auth.login') }}
+      </button>
+    </form>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -23,14 +22,13 @@ definePageMeta({ layout: 'blank' })
 
 const { t } = useI18n()
 const { fetch: refreshSession } = useUserSession()
+const toast = useToast()
 
 const email = ref('')
 const password = ref('')
-const error = ref('')
 const loading = ref(false)
 
 async function onSubmit() {
-  error.value = ''
   loading.value = true
   try {
     await $fetch('/api/auth/login', {
@@ -40,7 +38,7 @@ async function onSubmit() {
     await refreshSession()
     await navigateTo('/')
   } catch {
-    error.value = t('auth.invalidCredentials')
+    toast.add({ severity: 'error', summary: t('auth.invalidCredentials') })
   } finally {
     loading.value = false
   }
@@ -48,15 +46,15 @@ async function onSubmit() {
 </script>
 
 <style scoped>
+.login-card {
+  width: 100%;
+  max-width: 380px;
+}
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  margin-top: 1rem;
 }
 .submit-btn {
   margin-top: 0.5rem;

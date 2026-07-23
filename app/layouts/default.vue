@@ -1,9 +1,10 @@
 <template>
   <div class="app-shell">
-    <Toast />
+    <UiToasts />
+    <UiConfirm />
     <div v-if="session?.impersonatedBy" class="impersonation-banner">
       <span>{{ t('admin.impersonating', { name: `${user?.firstName} ${user?.lastName}` }) }}</span>
-      <Button :label="t('admin.backToAdmin')" size="small" severity="contrast" @click="stopImpersonation" />
+      <button class="btn" type="button" @click="stopImpersonation">{{ t('admin.backToAdmin') }}</button>
     </div>
     <header class="app-header">
       <span class="app-title">{{ t('app.title') }}</span>
@@ -14,13 +15,10 @@
       </nav>
       <div v-else class="app-nav" />
       <div class="app-lang">
-        <Select
-          v-model="locale"
-          :options="availableLocales"
-          option-label="name"
-          option-value="code"
-        />
-        <Button v-if="loggedIn" :label="t('nav.logout')" severity="secondary" text @click="logout" />
+        <select v-model="locale" :aria-label="t('app.title')">
+          <option v-for="l in availableLocales" :key="l.code" :value="l.code">{{ l.name }}</option>
+        </select>
+        <button v-if="loggedIn" class="btn btn-ghost" type="button" @click="logout">{{ t('nav.logout') }}</button>
       </div>
     </header>
     <main class="app-main">
@@ -58,7 +56,8 @@ async function stopImpersonation() {
   align-items: center;
   gap: 1rem;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
   flex-wrap: wrap;
 }
 .app-title {
@@ -69,6 +68,14 @@ async function stopImpersonation() {
   display: flex;
   gap: 1rem;
   flex: 1;
+}
+.app-lang {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.app-lang select {
+  width: auto;
 }
 .app-main {
   padding: 1rem;

@@ -18,6 +18,11 @@
     "title": "Error",
     "generic": "Something went wrong"
   },
+  "confirm": {
+    "title": "Confirm",
+    "cancel": "Cancel",
+    "ok": "OK"
+  },
   "admin": {
     "newUser": "New user",
     "editUser": "Edit user",

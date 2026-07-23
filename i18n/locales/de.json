@@ -18,6 +18,11 @@
     "title": "Fehler",
     "generic": "Etwas ist schiefgelaufen"
   },
+  "confirm": {
+    "title": "Bestätigen",
+    "cancel": "Abbrechen",
+    "ok": "OK"
+  },
   "admin": {
     "newUser": "Neuer Benutzer",
     "editUser": "Benutzer bearbeiten",
