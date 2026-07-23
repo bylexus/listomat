@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm'
 import { sqliteTable, text, integer, uniqueIndex, index } from 'drizzle-orm/sqlite-core'
 
 // Timestamps als Unix-Millisekunden (integer, mode: 'timestamp_ms')
@@ -54,3 +55,11 @@ export const entries = sqliteTable('entries', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
 })
+
+export const groupsRelations = relations(groups, ({ many }) => ({
+  entries: many(entries)
+}))
+
+export const entriesRelations = relations(entries, ({ one }) => ({
+  group: one(groups, { fields: [entries.groupId], references: [groups.id] })
+}))

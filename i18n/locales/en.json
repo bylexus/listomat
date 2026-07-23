@@ -48,5 +48,17 @@
     "impersonate": "Log in as",
     "impersonating": "Logged in as {name}",
     "backToAdmin": "Back to admin"
+  },
+  "templates": {
+    "newGroup": "New group",
+    "defaultGroupName": "New group",
+    "empty": "No templates yet. Create a new group.",
+    "deleteGroup": "Delete group",
+    "deleteGroupConfirm": "Delete group \"{name}\" including all entries?",
+    "deleteEntry": "Delete entry",
+    "addEntryPlaceholder": "+ Add entry",
+    "commentPlaceholder": "Comment",
+    "dragGroup": "Move group",
+    "dragEntry": "Move entry"
   }
 }

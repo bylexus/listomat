@@ -48,5 +48,17 @@
     "impersonate": "Anmelden als",
     "impersonating": "Angemeldet als {name}",
     "backToAdmin": "Zurück zu Admin"
+  },
+  "templates": {
+    "newGroup": "Neue Gruppe",
+    "defaultGroupName": "Neue Gruppe",
+    "empty": "Noch keine Vorlagen. Erstelle eine neue Gruppe.",
+    "deleteGroup": "Gruppe löschen",
+    "deleteGroupConfirm": "Gruppe „{name}“ inkl. aller Einträge löschen?",
+    "deleteEntry": "Eintrag löschen",
+    "addEntryPlaceholder": "+ Eintrag hinzufügen",
+    "commentPlaceholder": "Kommentar",
+    "dragGroup": "Gruppe verschieben",
+    "dragEntry": "Eintrag verschieben"
   }
 }
