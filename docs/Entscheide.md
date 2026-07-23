@@ -99,6 +99,11 @@ Ergänzungen und Präzisierungen zu `Planung.md`. Bei Widerspruch gilt dieses Do
 - Keine Validierungslib; eigene minimale zentrale Validierungsfunktionen.
 - Grüne Wiese: `git init`, `nuxi init`.
 
+## API-Security
+
+- Globale Server-Middleware (`server/middleware/auth.ts`): alle `/api/*`-Routen erfordern eine gültige Session; public sind nur `/api/auth/login` und `/api/auth/logout`.
+- Die per-Route-Checks (`requireUser`/`requireAdmin`) bleiben zusätzlich bestehen (Defense-in-Depth, liefern das User-Objekt).
+
 ## Offen
 
 - (wird laufend ergänzt)
