@@ -11,14 +11,14 @@ interface ListSummary {
   updatedAt: Date
 }
 
-type ListWithProgress = {
+type ListWithEntries = {
   id: string
   name: string
   updatedAt: Date
   groups: { entries: { done: boolean }[] }[]
 }
 
-function toSummary(list: ListWithProgress, ownerName: string): ListSummary {
+function toSummary(list: ListWithEntries, ownerName: string): ListSummary {
   const allEntries = list.groups.flatMap((g) => g.entries)
   return {
     id: list.id,
