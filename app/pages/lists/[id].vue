@@ -31,6 +31,15 @@
           </svg>
           {{ t('listDetail.duplicate') }}
         </button>
+        <button v-if="list.isOwner" class="btn" type="button" :title="t('listDetail.share')" @click="openShareDialog">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <path d="M8.6 10.6l6.8-3.2M8.6 13.4l6.8 3.2" />
+          </svg>
+          {{ t('listDetail.share') }}
+        </button>
       </div>
     </div>
 
@@ -157,6 +166,32 @@
         </div>
       </div>
     </UiModal>
+
+    <UiModal v-if="list.isOwner" :open="shareDialogOpen" @close="shareDialogOpen = false">
+      <template #header>{{ t('listDetail.shareTitle') }}</template>
+      <div class="form-field">
+        <label>{{ t('listDetail.shareEmailLabel') }}</label>
+        <div class="dialog-row">
+          <input v-model="newShareEmail" type="email" @keydown.enter.prevent="addShare" />
+          <button class="btn btn-primary" type="button" :disabled="!newShareEmail.trim()" @click="addShare">
+            {{ t('listDetail.shareAdd') }}
+          </button>
+        </div>
+      </div>
+      <div class="form-field">
+        <p v-if="!list.shares || list.shares.length === 0" class="empty-state">{{ t('listDetail.noShares') }}</p>
+        <ul v-else class="share-list">
+          <li v-for="share in list.shares" :key="share.id" class="share-row">
+            <span>{{ share.email }}</span>
+            <button class="btn btn-ghost" type="button" :title="t('listDetail.removeShare')" @click="removeShare(share)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </UiModal>
   </div>
 </template>
 
@@ -185,6 +220,11 @@ interface ListGroup {
   entries: ListEntry[]
 }
 
+interface ListShare {
+  id: string
+  email: string
+}
+
 interface ListDetail {
   id: string
   name: string
@@ -193,7 +233,7 @@ interface ListDetail {
   updatedAt: string
   groups: ListGroup[]
   isOwner: boolean
-  shares?: { id: string; email: string }[]
+  shares?: ListShare[]
 }
 
 const { t } = useI18n()
@@ -210,6 +250,9 @@ const groupDialogOpen = ref(false)
 const newGroupName = ref('')
 const templates = ref<{ id: string; name: string }[]>([])
 const selectedTemplateId = ref('')
+
+const shareDialogOpen = ref(false)
+const newShareEmail = ref('')
 
 function blurTarget(event: Event) {
   ;(event.target as HTMLElement).blur()
@@ -461,6 +504,34 @@ async function duplicateList() {
   }
 }
 
+// --- Freigaben ---
+
+function openShareDialog() {
+  newShareEmail.value = ''
+  shareDialogOpen.value = true
+}
+
+async function addShare() {
+  const email = newShareEmail.value.trim()
+  if (!email || !list.value) return
+  const result = await call(() =>
+    $fetch<ListShare>(`/api/lists/${listId}/shares`, { method: 'POST', body: { email } })
+  )
+  if (result) {
+    if (!list.value.shares) list.value.shares = []
+    list.value.shares.push(result)
+    newShareEmail.value = ''
+  }
+}
+
+async function removeShare(share: ListShare) {
+  if (!list.value?.shares) return
+  const result = await call(() => $fetch(`/api/lists/${listId}/shares/${share.id}`, { method: 'DELETE' }))
+  if (result) {
+    list.value.shares = list.value.shares.filter((s) => s.id !== share.id)
+  }
+}
+
 onMounted(loadList)
 </script>
 
@@ -576,5 +647,20 @@ onMounted(loadList)
 .dialog-row select {
   flex: 1;
   min-width: 0;
+}
+.share-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.share-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 2px 4px;
 }
 </style>

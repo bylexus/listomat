@@ -122,6 +122,12 @@ Ergänzungen und Präzisierungen zu `Planung.md`. Bei Widerspruch gilt dieses Do
 - Duplizieren-Aktion auch auf den Übersichts-Kacheln (eigene und geteilte, gemäss UI-Spez).
 - Export- und Teilen-Buttons in der Detail-Toolbar folgen mit E9 bzw. E8.
 
+## E8 – Freigaben
+
+- `POST /api/lists/:id/reset`: Zugriff bleibt Owner oder Shared (`requireListAccess`), wie bereits in E7 umgesetzt. Die Spec-Tabelle nennt hier keine explizite Einschränkung (anders als PATCH/DELETE „nur Owner“ bzw. duplicate „Owner oder Shared“); bestätigt.
+- Freigabe entfernen: keine Bestätigungsdialog nötig (analog Eintrag löschen), da reversibel (erneut teilen möglich).
+- E-Mail-Abgleich beim Teilen: lowercase + trim (wie Login), unbekannt/inaktiv → 404 ohne Unterscheidung (kein Existenz-Leak).
+
 ## Offen
 
 - (wird laufend ergänzt)

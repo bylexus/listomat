@@ -94,6 +94,12 @@
     "dragEntry": "Move entry",
     "reset": "Reset",
     "resetConfirm": "Reset all checkmarks of this list?",
-    "duplicate": "Duplicate"
+    "duplicate": "Duplicate",
+    "share": "Share",
+    "shareTitle": "Share list",
+    "shareEmailLabel": "Email address",
+    "shareAdd": "Add",
+    "noShares": "Not shared with anyone yet.",
+    "removeShare": "Remove access"
   }
 }

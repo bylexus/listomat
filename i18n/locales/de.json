@@ -94,6 +94,12 @@
     "dragEntry": "Eintrag verschieben",
     "reset": "Zurücksetzen",
     "resetConfirm": "Alle Haken dieser Liste zurücksetzen?",
-    "duplicate": "Duplizieren"
+    "duplicate": "Duplizieren",
+    "share": "Teilen",
+    "shareTitle": "Liste teilen",
+    "shareEmailLabel": "E-Mail-Adresse",
+    "shareAdd": "Hinzufügen",
+    "noShares": "Noch mit niemandem geteilt.",
+    "removeShare": "Freigabe entfernen"
   }
 }

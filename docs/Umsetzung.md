@@ -363,11 +363,11 @@ Prüfpunkte: Vorlagen-CRUD komplett, Sortierung überlebt Reload, fremde Vorlage
 GET/POST/PATCH/DELETE /api/lists, Übersichtsseite mit Kacheln + Fortschritt, Liste anlegen (öffnet direkt Detail), löschen mit Bestätigung.
 Prüfpunkte: Liste anlegen/umbenennen/löschen, Kachel zeigt Fortschritt 0/0.
 
-**E7 – Listen-Detail** *(umgesetzt, Freigabe ausstehend)*
+**E7 – Listen-Detail** *(erledigt)*
 Gruppen/Einträge-CRUD in der Liste, done-Checkbox, Kommentare, DnD (Gruppen, Einträge inkl. gruppenübergreifend), Fortschritt, Reset, Duplizieren, Vorlage→Liste und Liste→Vorlage.
 Prüfpunkte: kompletter Packlisten-Workflow durchspielbar; Eintrag in andere Gruppe ziehen; Duplikat hat Kommentare, aber keine Haken.
 
-**E8 – Freigaben**
+**E8 – Freigaben** *(umgesetzt, Freigabe ausstehend)*
 Share-Routen, Teilen-Dialog, geteilte Listen in Übersicht, Rechteprüfung (Shared darf nicht umbenennen/löschen/teilen, darf aber Gruppen/Einträge verwalten und duplizieren).
 Prüfpunkte: mit 2 Usern testen; unbekannte E-Mail → Fehler; Freigabe entfernen wirkt.
 
