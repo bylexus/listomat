@@ -371,7 +371,7 @@ Prüfpunkte: kompletter Packlisten-Workflow durchspielbar; Eintrag in andere Gru
 Share-Routen, Teilen-Dialog, geteilte Listen in Übersicht, Rechteprüfung (Shared darf nicht umbenennen/löschen/teilen, darf aber Gruppen/Einträge verwalten und duplizieren).
 Prüfpunkte: mit 2 Usern testen; unbekannte E-Mail → Fehler; Freigabe entfernen wirkt.
 
-**E9 – Export** *(umgesetzt, Freigabe ausstehend)*
+**E9 – Export** *(erledigt)*
 PDF- und Excel-Route, Export-Dialog.
 Prüfpunkte: beide Formate mit status=current und status=empty; PDF zweispaltig, Gruppen nicht umbrochen; Excel formatiert.
 
