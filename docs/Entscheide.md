@@ -128,6 +128,17 @@ Ergänzungen und Präzisierungen zu `Planung.md`. Bei Widerspruch gilt dieses Do
 - Freigabe entfernen: keine Bestätigungsdialog nötig (analog Eintrag löschen), da reversibel (erneut teilen möglich).
 - E-Mail-Abgleich beim Teilen: lowercase + trim (wie Login), unbekannt/inaktiv → 404 ohne Unterscheidung (kein Existenz-Leak).
 
+## E9 – Export
+
+- Zugriff `GET /api/lists/:id/export/pdf|xlsx`: Owner oder Shared (`requireListAccess`), bestätigt (Spec-Tabelle ohne Rechte-Vermerk).
+- `?status` ist Pflichtparameter (400 bei Fehlen/ungültigem Wert); kein Default, da die Spec keinen nennt.
+- PDF: Kommentar steht unter dem Eintragsnamen (nicht daneben) – bessere Breitenausnutzung, einheitliche Höhenberechnung.
+- PDF-Kopf (Titel + Exportdatum) erscheint nur auf Seite 1; Folgeseiten beginnen direkt mit Spalteninhalt.
+- "Länger als eine ganze Spalte" wird konservativ anhand der kleineren Spaltenhöhe (Seite 1, nach Kopf) geprüft; das kann in Einzelfällen eine Gruppe entry-weise umbrechen, die in einer leeren Spalte auf Folgeseiten knapp gepasst hätte – sicherer als Überlauf.
+- Beim entry-weisen Umbruch einer übergrossen Gruppe wird der Gruppentitel bei Spalten-/Seitenwechsel nicht wiederholt (kein "Fortsetzung"-Label).
+- Export-Dialog: Radiobuttons für Format (PDF/Excel) und Status (aktuell/leer), Download via Klick auf unsichtbaren Link (Browser sendet Session-Cookie automatisch, kein Blob/fetch nötig). Sichtbar für Owner und Shared.
+- Dateiname: `Content-Disposition` mit ASCII-Fallback plus `filename*=UTF-8''…` für Umlaute/Sonderzeichen; verbotene Dateisystem-Zeichen werden ersetzt.
+
 ## Offen
 
 - (wird laufend ergänzt)

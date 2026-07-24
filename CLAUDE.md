@@ -35,6 +35,6 @@ Vor jeder Arbeit an einer neuen Etappe: `docs/Umsetzung.md` zur betreffenden Eta
 
 ## Aktueller Stand (bei Etappenabschluss aktualisieren)
 
-- Erledigt: E1–E7, E3b (PrimeVue-Ausbau), globale API-Auth-Middleware
-- **E8 – Freigaben: umgesetzt, Freigabe ausstehend**
-- Nächste Etappe nach Freigabe: E9 – Export
+- Erledigt: E1–E8, E3b (PrimeVue-Ausbau), globale API-Auth-Middleware
+- **E9 – Export: umgesetzt, Freigabe ausstehend**
+- Nächste Etappe nach Freigabe: E10 – Docker

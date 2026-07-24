@@ -367,11 +367,11 @@ Prüfpunkte: Liste anlegen/umbenennen/löschen, Kachel zeigt Fortschritt 0/0.
 Gruppen/Einträge-CRUD in der Liste, done-Checkbox, Kommentare, DnD (Gruppen, Einträge inkl. gruppenübergreifend), Fortschritt, Reset, Duplizieren, Vorlage→Liste und Liste→Vorlage.
 Prüfpunkte: kompletter Packlisten-Workflow durchspielbar; Eintrag in andere Gruppe ziehen; Duplikat hat Kommentare, aber keine Haken.
 
-**E8 – Freigaben** *(umgesetzt, Freigabe ausstehend)*
+**E8 – Freigaben** *(erledigt)*
 Share-Routen, Teilen-Dialog, geteilte Listen in Übersicht, Rechteprüfung (Shared darf nicht umbenennen/löschen/teilen, darf aber Gruppen/Einträge verwalten und duplizieren).
 Prüfpunkte: mit 2 Usern testen; unbekannte E-Mail → Fehler; Freigabe entfernen wirkt.
 
-**E9 – Export**
+**E9 – Export** *(umgesetzt, Freigabe ausstehend)*
 PDF- und Excel-Route, Export-Dialog.
 Prüfpunkte: beide Formate mit status=current und status=empty; PDF zweispaltig, Gruppen nicht umbrochen; Excel formatiert.
 

@@ -31,6 +31,12 @@
           </svg>
           {{ t('listDetail.duplicate') }}
         </button>
+        <button class="btn" type="button" :title="t('listDetail.export')" @click="openExportDialog">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3v12M7 10l5 5 5-5M5 21h14" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          {{ t('listDetail.export') }}
+        </button>
         <button v-if="list.isOwner" class="btn" type="button" :title="t('listDetail.share')" @click="openShareDialog">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="18" cy="5" r="3" />
@@ -192,6 +198,27 @@
         </ul>
       </div>
     </UiModal>
+
+    <UiModal :open="exportDialogOpen" @close="exportDialogOpen = false">
+      <template #header>{{ t('listDetail.exportTitle') }}</template>
+      <div class="form-field">
+        <label>{{ t('listDetail.formatLabel') }}</label>
+        <div class="radio-row">
+          <label class="radio-option"><input v-model="exportFormat" type="radio" value="pdf" /> {{ t('listDetail.formatPdf') }}</label>
+          <label class="radio-option"><input v-model="exportFormat" type="radio" value="xlsx" /> {{ t('listDetail.formatExcel') }}</label>
+        </div>
+      </div>
+      <div class="form-field">
+        <label>{{ t('listDetail.statusLabel') }}</label>
+        <div class="radio-row">
+          <label class="radio-option"><input v-model="exportStatus" type="radio" value="current" /> {{ t('listDetail.statusCurrent') }}</label>
+          <label class="radio-option"><input v-model="exportStatus" type="radio" value="empty" /> {{ t('listDetail.statusEmpty') }}</label>
+        </div>
+      </div>
+      <template #footer>
+        <button class="btn btn-primary" type="button" @click="runExport">{{ t('listDetail.exportAction') }}</button>
+      </template>
+    </UiModal>
   </div>
 </template>
 
@@ -253,6 +280,10 @@ const selectedTemplateId = ref('')
 
 const shareDialogOpen = ref(false)
 const newShareEmail = ref('')
+
+const exportDialogOpen = ref(false)
+const exportFormat = ref<'pdf' | 'xlsx'>('pdf')
+const exportStatus = ref<'current' | 'empty'>('current')
 
 function blurTarget(event: Event) {
   ;(event.target as HTMLElement).blur()
@@ -532,6 +563,20 @@ async function removeShare(share: ListShare) {
   }
 }
 
+// --- Export ---
+
+function openExportDialog() {
+  exportDialogOpen.value = true
+}
+
+function runExport() {
+  const url = `/api/lists/${listId}/export/${exportFormat.value}?status=${exportStatus.value}`
+  const link = document.createElement('a')
+  link.href = url
+  link.click()
+  exportDialogOpen.value = false
+}
+
 onMounted(loadList)
 </script>
 
@@ -662,5 +707,15 @@ onMounted(loadList)
   justify-content: space-between;
   gap: var(--space-2);
   padding: 2px 4px;
+}
+.radio-row {
+  display: flex;
+  gap: var(--space-3);
+}
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: normal;
 }
 </style>

@@ -100,6 +100,15 @@
     "shareEmailLabel": "Email address",
     "shareAdd": "Add",
     "noShares": "Not shared with anyone yet.",
-    "removeShare": "Remove access"
+    "removeShare": "Remove access",
+    "export": "Export",
+    "exportTitle": "Export list",
+    "formatLabel": "Format",
+    "formatPdf": "PDF",
+    "formatExcel": "Excel",
+    "statusLabel": "Status",
+    "statusCurrent": "Current status",
+    "statusEmpty": "Empty (to check off)",
+    "exportAction": "Download"
   }
 }
