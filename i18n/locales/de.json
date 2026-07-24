@@ -60,5 +60,16 @@
     "commentPlaceholder": "Kommentar",
     "dragGroup": "Gruppe verschieben",
     "dragEntry": "Eintrag verschieben"
+  },
+  "lists": {
+    "newList": "Neue Liste",
+    "defaultName": "Neue Liste",
+    "mine": "Meine Listen",
+    "sharedWithMe": "Mit mir geteilt",
+    "empty": "Noch keine Listen. Erstelle eine neue Liste.",
+    "rename": "Umbenennen",
+    "deleteList": "Liste löschen",
+    "deleteConfirm": "Liste „{name}“ inkl. aller Gruppen und Einträge löschen?",
+    "byOwner": "von {name}"
   }
 }

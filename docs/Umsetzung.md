@@ -203,7 +203,7 @@ Keine Passwortregeln. Admin kann sich nicht selbst deaktivieren (400).
 | Methode/Pfad | Body | Antwort |
 |---|---|---|
 | GET /api/lists | – | { own: ListSummary[], shared: ListSummary[] }; ListSummary = { id, name, ownerName, progress: { done, total }, updatedAt } |
-| POST /api/lists | – (Name automatisch, i18n-Default z.B. "Neue Liste") | List |
+| POST /api/lists | { name? } (Default "Neue Liste" macht der Client via i18n; Server-Fallback identisch) | List |
 | GET /api/lists/:id | – | List inkl. groups[] inkl. entries[], alles sortiert, plus { isOwner, shares: [{ id, email }] (nur für Owner) } |
 | PATCH /api/lists/:id | { name } | nur Owner | List |
 | DELETE /api/lists/:id | – | nur Owner | { ok: true } |
@@ -284,7 +284,7 @@ Kein UI-Framework. Verbindliche Bausteine:
 
 ### Seiten
 - `/login`
-- `/` – Listenübersicht (Kacheln: eigene + geteilte, Abschnittstitel; Kachel: Name + Fortschritt "3/7" + `UiProgress`; Klick öffnet; Aktionen: neu, duplizieren, löschen (nur Owner, mit Bestätigung), teilen (nur Owner))
+- `/` – Listenübersicht (Kacheln: eigene + geteilte, Abschnittstitel; Kachel: Name + Fortschritt "3/7" + `UiProgress`; Klick öffnet (ab E7); Aktionen: neu, umbenennen (nur Owner, contenteditable auf der Kachel mit Stift-Icon), duplizieren, löschen (nur Owner, mit Bestätigung), teilen (nur Owner))
 - `/lists/:id` – Listen-Detail
 - `/templates` – Vorlagen-Verwaltung
 - `/admin/users` – Userverwaltung (nur Admin)
@@ -359,7 +359,7 @@ Prüfpunkte: User anlegen, bearbeiten, deaktivieren (Login dann unmöglich), Pas
 Template-Routen + Seite, CRUD Gruppen/Einträge, DnD-Sortierung, Neunummerierung.
 Prüfpunkte: Vorlagen-CRUD komplett, Sortierung überlebt Reload, fremde Vorlagen unsichtbar (mit 2. User testen).
 
-**E6 – Listen: Übersicht + CRUD** *(nächste Etappe)*
+**E6 – Listen: Übersicht + CRUD** *(umgesetzt, Freigabe ausstehend)*
 GET/POST/PATCH/DELETE /api/lists, Übersichtsseite mit Kacheln + Fortschritt, Liste anlegen (öffnet direkt Detail), löschen mit Bestätigung.
 Prüfpunkte: Liste anlegen/umbenennen/löschen, Kachel zeigt Fortschritt 0/0.
 

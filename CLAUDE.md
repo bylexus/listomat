@@ -36,4 +36,5 @@ Vor jeder Arbeit an einer neuen Etappe: `docs/Umsetzung.md` zur betreffenden Eta
 ## Aktueller Stand (bei Etappenabschluss aktualisieren)
 
 - Erledigt: E1–E5, E3b (PrimeVue-Ausbau), globale API-Auth-Middleware
-- **Nächste Etappe: E6 – Listen: Übersicht + CRUD**
+- **E6 – Listen: Übersicht + CRUD: umgesetzt, Freigabe ausstehend**
+- Nächste Etappe nach Freigabe: E7 – Listen-Detail

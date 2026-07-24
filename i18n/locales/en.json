@@ -60,5 +60,16 @@
     "commentPlaceholder": "Comment",
     "dragGroup": "Move group",
     "dragEntry": "Move entry"
+  },
+  "lists": {
+    "newList": "New list",
+    "defaultName": "New list",
+    "mine": "My lists",
+    "sharedWithMe": "Shared with me",
+    "empty": "No lists yet. Create a new list.",
+    "rename": "Rename",
+    "deleteList": "Delete list",
+    "deleteConfirm": "Delete list \"{name}\" including all groups and entries?",
+    "byOwner": "by {name}"
   }
 }

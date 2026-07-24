@@ -104,6 +104,14 @@ Ergänzungen und Präzisierungen zu `Planung.md`. Bei Widerspruch gilt dieses Do
 - Globale Server-Middleware (`server/middleware/auth.ts`): alle `/api/*`-Routen erfordern eine gültige Session; public sind nur `/api/auth/login` und `/api/auth/logout`.
 - Die per-Route-Checks (`requireUser`/`requireAdmin`) bleiben zusätzlich bestehen (Defense-in-Depth, liefern das User-Objekt).
 
+## E6 – Listenübersicht
+
+- Umbenennen einer Liste erfolgt direkt auf der Kachel: Name als contenteditable mit Stift-Icon (Icon fokussiert/selektiert den Namen). Kein Detail-Stub in E6; «Klick öffnet Detail» kommt mit E7.
+- `POST /api/lists`: Der Client sendet den Default-Namen via i18n im Body (`{ name }`, analog Gruppen-Default); der Server akzeptiert ihn als optionalen String mit Fallback «Neue Liste».
+- Sortierung der Kacheln: nach `updatedAt` absteigend (eigene und geteilte je separat).
+- Abschnitt «Mit mir geteilt» wird nur angezeigt, wenn geteilte Listen vorhanden sind.
+- `GET /api/lists/:id` wird erst mit E7 (Listen-Detail) implementiert.
+
 ## Offen
 
 - (wird laufend ergänzt)

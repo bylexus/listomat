@@ -56,7 +56,19 @@ export const entries = sqliteTable('entries', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
 })
 
-export const groupsRelations = relations(groups, ({ many }) => ({
+export const listsRelations = relations(lists, ({ one, many }) => ({
+  owner: one(users, { fields: [lists.ownerId], references: [users.id] }),
+  groups: many(groups),
+  shares: many(listShares)
+}))
+
+export const listSharesRelations = relations(listShares, ({ one }) => ({
+  list: one(lists, { fields: [listShares.listId], references: [lists.id] }),
+  sharedUser: one(users, { fields: [listShares.sharedUserId], references: [users.id] })
+}))
+
+export const groupsRelations = relations(groups, ({ one, many }) => ({
+  list: one(lists, { fields: [groups.listId], references: [lists.id] }),
   entries: many(entries)
 }))
 
