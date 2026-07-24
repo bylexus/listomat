@@ -17,7 +17,7 @@
         <h2 class="section-title">{{ t('lists.mine') }}</h2>
         <p v-if="own.length === 0" class="empty-state">{{ t('lists.empty') }}</p>
         <div v-else class="lists-grid">
-          <div v-for="list in own" :key="list.id" class="card list-card">
+          <div v-for="list in own" :key="list.id" class="card list-card clickable" @click="openList(list, $event)">
             <div class="list-card-header">
               <h3
                 :ref="(el) => setNameRef(list.id, el)"
@@ -36,6 +36,12 @@
                   />
                 </svg>
               </button>
+              <button class="btn btn-ghost" type="button" :title="t('lists.duplicate')" @click="duplicateList(list)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="12" height="12" rx="2" />
+                  <path d="M5 15V5a2 2 0 0 1 2-2h10" stroke-linecap="round" />
+                </svg>
+              </button>
               <button class="btn btn-ghost" type="button" :title="t('lists.deleteList')" @click="confirmDeleteList(list)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
@@ -50,9 +56,15 @@
       <section v-if="shared.length > 0">
         <h2 class="section-title">{{ t('lists.sharedWithMe') }}</h2>
         <div class="lists-grid">
-          <div v-for="list in shared" :key="list.id" class="card list-card">
+          <div v-for="list in shared" :key="list.id" class="card list-card clickable" @click="openList(list, $event)">
             <div class="list-card-header">
               <h3 class="list-name">{{ list.name }}</h3>
+              <button class="btn btn-ghost" type="button" :title="t('lists.duplicate')" @click="duplicateList(list)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="12" height="12" rx="2" />
+                  <path d="M5 15V5a2 2 0 0 1 2-2h10" stroke-linecap="round" />
+                </svg>
+              </button>
             </div>
             <p class="list-owner">{{ t('lists.byOwner', { name: list.ownerName }) }}</p>
             <UiProgress :done="list.progress.done" :total="list.progress.total" />
@@ -120,16 +132,27 @@ async function addList() {
     })
   )
   if (!result) return
-  own.value.unshift({
-    id: result.id,
-    name: result.name,
-    ownerName: '',
-    progress: { done: 0, total: 0 },
-    updatedAt: result.updatedAt
-  })
-  // Titel der neuen Kachel direkt zum Umbenennen fokussieren
-  await nextTick()
-  focusName(result.id)
+  // Anlegen öffnet direkt das Detail
+  await navigateTo(`/lists/${result.id}`)
+}
+
+function openList(list: ListSummary, event: MouseEvent) {
+  // Klicks auf Buttons oder den editierbaren Namen navigieren nicht
+  if ((event.target as HTMLElement).closest('button, [contenteditable]')) return
+  navigateTo(`/lists/${list.id}`)
+}
+
+async function duplicateList(list: ListSummary) {
+  const result = await call(() =>
+    $fetch<{ id: string }>(`/api/lists/${list.id}/duplicate`, {
+      method: 'POST',
+      body: { name: `${list.name} ${t('lists.copySuffix')}` }
+    })
+  )
+  if (result) {
+    // Zur Kopie navigieren (Entscheid E7)
+    await navigateTo(`/lists/${result.id}`)
+  }
 }
 
 async function onRenameList(list: ListSummary, event: FocusEvent) {
@@ -184,6 +207,9 @@ onMounted(loadLists)
   .lists-grid {
     grid-template-columns: 1fr 1fr;
   }
+}
+.list-card.clickable {
+  cursor: pointer;
 }
 .list-card {
   display: flex;

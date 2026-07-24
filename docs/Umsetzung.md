@@ -292,8 +292,8 @@ Kein UI-Framework. Verbindliche Bausteine:
 ### Listen-Detail
 - Titel als contenteditable-H1 (nur Owner editierbar), Speichern bei blur.
 - Gruppen als Karten im Grid: mobile 1 Spalte, ab Tablet (min-width: 768px) 2 Spalten. CSS Grid, keine Zusatzlib.
-- Gruppen-Titel contenteditable; Karten-Aktionen: löschen (Bestätigungsdialog), als Vorlage speichern.
-- Einträge: Checkbox (done) + Name (contenteditable oder Inline-Edit) + Kommentar (kleiner, editierbar) + Löschen-Icon (ohne Bestätigung). Neue Einträge über Eingabefeld am Gruppenende (Enter = anlegen).
+- Gruppen-Titel contenteditable; Karten-Aktionen: löschen (Bestätigungsdialog), als Vorlage speichern. Neue Gruppe via Plus-Button in der Toolbar: kleiner Dialog mit Bezeichnungs-Eingabe oder Vorlagen-Auswahl (Select) zum Einfügen.
+- Einträge: Checkbox (done) + Name (contenteditable) + Kommentar (kleiner, Input-Feld) + Löschen-Icon (ohne Bestätigung). Neue Einträge über Eingabefeld am Gruppenende (Enter = anlegen).
 - Fortschritt pro Gruppe im Karten-Header (z.B. "2/5").
 - Drag'n'drop: Gruppen untereinander sortieren; Einträge innerhalb Gruppe und zwischen Gruppen. Umsetzung mit `vue-draggable-plus` (SortableJS-basiert, Vue-3-kompatibel, Touch-Support). Keine weiteren DnD-Libs.
 - Toolbar: Reset-Haken (mit Bestätigung), Duplizieren, Export-Dialog (Format PDF/Excel + Status aktuell/leer), Teilen-Dialog (nur Owner: E-Mail-Feld, Liste der Freigaben mit Entfernen).
@@ -359,11 +359,11 @@ Prüfpunkte: User anlegen, bearbeiten, deaktivieren (Login dann unmöglich), Pas
 Template-Routen + Seite, CRUD Gruppen/Einträge, DnD-Sortierung, Neunummerierung.
 Prüfpunkte: Vorlagen-CRUD komplett, Sortierung überlebt Reload, fremde Vorlagen unsichtbar (mit 2. User testen).
 
-**E6 – Listen: Übersicht + CRUD** *(umgesetzt, Freigabe ausstehend)*
+**E6 – Listen: Übersicht + CRUD** *(erledigt)*
 GET/POST/PATCH/DELETE /api/lists, Übersichtsseite mit Kacheln + Fortschritt, Liste anlegen (öffnet direkt Detail), löschen mit Bestätigung.
 Prüfpunkte: Liste anlegen/umbenennen/löschen, Kachel zeigt Fortschritt 0/0.
 
-**E7 – Listen-Detail**
+**E7 – Listen-Detail** *(umgesetzt, Freigabe ausstehend)*
 Gruppen/Einträge-CRUD in der Liste, done-Checkbox, Kommentare, DnD (Gruppen, Einträge inkl. gruppenübergreifend), Fortschritt, Reset, Duplizieren, Vorlage→Liste und Liste→Vorlage.
 Prüfpunkte: kompletter Packlisten-Workflow durchspielbar; Eintrag in andere Gruppe ziehen; Duplikat hat Kommentare, aber keine Haken.
 

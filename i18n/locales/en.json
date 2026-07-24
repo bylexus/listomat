@@ -70,6 +70,30 @@
     "rename": "Rename",
     "deleteList": "Delete list",
     "deleteConfirm": "Delete list \"{name}\" including all groups and entries?",
-    "byOwner": "by {name}"
+    "byOwner": "by {name}",
+    "copySuffix": "(Copy)",
+    "duplicate": "Duplicate"
+  },
+  "listDetail": {
+    "newGroup": "New group",
+    "newGroupTitle": "Add group",
+    "groupNameLabel": "Name",
+    "create": "Create",
+    "orFromTemplate": "or from template",
+    "insert": "Insert",
+    "noTemplates": "No templates available.",
+    "empty": "No groups yet. Add a group.",
+    "saveAsTemplate": "Save as template",
+    "savedAsTemplate": "Group saved as template.",
+    "deleteGroup": "Delete group",
+    "deleteGroupConfirm": "Delete group \"{name}\" including all entries?",
+    "deleteEntry": "Delete entry",
+    "addEntryPlaceholder": "+ Add entry",
+    "commentPlaceholder": "Comment",
+    "dragGroup": "Move group",
+    "dragEntry": "Move entry",
+    "reset": "Reset",
+    "resetConfirm": "Reset all checkmarks of this list?",
+    "duplicate": "Duplicate"
   }
 }

@@ -70,6 +70,30 @@
     "rename": "Umbenennen",
     "deleteList": "Liste löschen",
     "deleteConfirm": "Liste „{name}“ inkl. aller Gruppen und Einträge löschen?",
-    "byOwner": "von {name}"
+    "byOwner": "von {name}",
+    "copySuffix": "(Kopie)",
+    "duplicate": "Duplizieren"
+  },
+  "listDetail": {
+    "newGroup": "Neue Gruppe",
+    "newGroupTitle": "Gruppe hinzufügen",
+    "groupNameLabel": "Bezeichnung",
+    "create": "Erstellen",
+    "orFromTemplate": "oder aus Vorlage",
+    "insert": "Einfügen",
+    "noTemplates": "Keine Vorlagen vorhanden.",
+    "empty": "Noch keine Gruppen. Füge eine Gruppe hinzu.",
+    "saveAsTemplate": "Als Vorlage speichern",
+    "savedAsTemplate": "Gruppe als Vorlage gespeichert.",
+    "deleteGroup": "Gruppe löschen",
+    "deleteGroupConfirm": "Gruppe „{name}“ inkl. aller Einträge löschen?",
+    "deleteEntry": "Eintrag löschen",
+    "addEntryPlaceholder": "+ Eintrag hinzufügen",
+    "commentPlaceholder": "Kommentar",
+    "dragGroup": "Gruppe verschieben",
+    "dragEntry": "Eintrag verschieben",
+    "reset": "Zurücksetzen",
+    "resetConfirm": "Alle Haken dieser Liste zurücksetzen?",
+    "duplicate": "Duplizieren"
   }
 }

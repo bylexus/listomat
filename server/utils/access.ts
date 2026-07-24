@@ -1,7 +1,7 @@
 import type { H3Event } from 'h3'
 import { and, eq, isNull } from 'drizzle-orm'
 import { db } from '../db'
-import { groups, lists, listShares } from '../db/schema'
+import { entries, groups, lists, listShares } from '../db/schema'
 import { requireUser } from './auth'
 
 // Vorlagen-Gruppen (listId = null) sind strikt privat: nur der Owner hat Zugriff.
@@ -44,4 +44,26 @@ export async function requireListOwner(event: H3Event, listId: string) {
     throw createError({ statusCode: 404, statusMessage: 'Not found' })
   }
   return { user, list }
+}
+
+// Gruppe muss zur angegebenen Liste gehören, sonst 404.
+export async function requireListGroup(listId: string, groupId: string) {
+  const group = await db.query.groups.findFirst({
+    where: and(eq(groups.id, groupId), eq(groups.listId, listId))
+  })
+  if (!group) {
+    throw createError({ statusCode: 404, statusMessage: 'Not found' })
+  }
+  return group
+}
+
+// Eintrag muss zur angegebenen Gruppe gehören, sonst 404.
+export async function requireGroupEntry(groupId: string, entryId: string) {
+  const entry = await db.query.entries.findFirst({
+    where: and(eq(entries.id, entryId), eq(entries.groupId, groupId))
+  })
+  if (!entry) {
+    throw createError({ statusCode: 404, statusMessage: 'Not found' })
+  }
+  return entry
 }

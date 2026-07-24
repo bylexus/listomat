@@ -112,6 +112,16 @@ Ergänzungen und Präzisierungen zu `Planung.md`. Bei Widerspruch gilt dieses Do
 - Abschnitt «Mit mir geteilt» wird nur angezeigt, wenn geteilte Listen vorhanden sind.
 - `GET /api/lists/:id` wird erst mit E7 (Listen-Detail) implementiert.
 
+## E7 – Listen-Detail
+
+- Gruppe hinzufügen: Plus-Button öffnet einen kleinen Dialog (UiModal) mit zwei Wegen: Bezeichnung eingeben → neue leere Gruppe, oder eigene Vorlage aus Select-Dropdown wählen → Vorlage einfügen.
+- Umbenennen von Liste, Gruppen und Eintragsnamen jeweils via contenteditable; Kommentare bleiben Input-Felder. Gilt auch für die Vorlagen-Seite (Eintragsname dort von Input auf contenteditable umgestellt).
+- Nach «Duplizieren» (Detail und Übersichts-Kachel) wird zur Kopie navigiert. Den Kopie-Namen sendet der Client via i18n („… (Kopie)“); Server-Fallback identisch (analog Default-Name E6).
+- «Anlegen öffnet direkt Detail» ist nun aktiv; die E6-Übergangslösung (Fokus auf Kachel-Titel) ist ersetzt. Kachel-Klick öffnet das Detail (ausser auf Buttons/contenteditable).
+- «Als Vorlage speichern» verändert die Liste nicht → kein updatedAt-Touch; Erfolg wird per Toast bestätigt.
+- Duplizieren-Aktion auch auf den Übersichts-Kacheln (eigene und geteilte, gemäss UI-Spez).
+- Export- und Teilen-Buttons in der Detail-Toolbar folgen mit E9 bzw. E8.
+
 ## Offen
 
 - (wird laufend ergänzt)

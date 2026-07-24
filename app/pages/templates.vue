@@ -59,13 +59,13 @@
                 <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
               </svg>
             </span>
-            <input
+            <span
               class="entry-name"
-              type="text"
-              :value="entry.name"
+              contenteditable="true"
+              spellcheck="false"
               @blur="onEntryNameBlur(group, entry, $event)"
               @keydown.enter.prevent="blurTarget($event)"
-            />
+            >{{ entry.name }}</span>
             <input
               class="entry-comment"
               type="text"
@@ -191,10 +191,10 @@ async function addEntry(group: TemplateGroup) {
 }
 
 async function onEntryNameBlur(group: TemplateGroup, entry: TemplateEntry, event: FocusEvent) {
-  const el = event.target as HTMLInputElement
-  const value = el.value.trim()
+  const el = event.target as HTMLElement
+  const value = el.innerText.trim()
   if (!value) {
-    el.value = entry.name
+    el.innerText = entry.name
     return
   }
   if (value === entry.name) return
@@ -204,7 +204,7 @@ async function onEntryNameBlur(group: TemplateGroup, entry: TemplateEntry, event
   if (result) {
     entry.name = result.name
   } else {
-    el.value = entry.name
+    el.innerText = entry.name
   }
 }
 
@@ -309,6 +309,14 @@ onMounted(loadTemplates)
 
 .entry-name {
   flex: 2;
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius);
+  outline: none;
+}
+
+.entry-name:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -1px;
 }
 
 .entry-comment {
