@@ -3,7 +3,7 @@
 Arbeitsdokument für den Branch `shadcn-ui`. Hält Abklärungen, Erkenntnisse, offene Fragen
 und (später) die getroffenen Entscheide fest.
 
-Status: **Abklärung – noch keine Entscheide getroffen, noch kein Code geändert.**
+Status: **Abklärung – Grundsatzentscheide E-S1 bis E-S3 gefällt, F4/F6–F11 offen. Noch kein Code geändert.**
 
 ---
 
@@ -146,13 +146,13 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 
 | Nr. | Frage |
 |---|---|
-| F1 | Die Regel «Kein UI-Framework, kein CSS-Framework, keine Icon-Library» in `CLAUDE.md` wird durch shadcn-vue aufgehoben. Soll sie ersetzt oder gestrichen werden, und wie lautet die neue Formulierung? |
-| F2 | Tailwind CSS ist zwingende Voraussetzung. Ist Tailwind v4 als projektweite Styling-Basis akzeptiert – inklusive Utility-Klassen im Markup statt scoped CSS? |
-| F3 | Umgang mit `main.css`: (a) in `@layer` kapseln und behalten, (b) schrittweise abbauen, (c) sofort entfernen und alles migrieren? |
+| ~~F1~~ | *geklärt → E-S1* |
+| ~~F2~~ | *geklärt → E-S1* |
+| ~~F3~~ | *geklärt → E-S2* |
 | F4 | Komponenten-Verzeichnis und Prefix: shadcn nach `app/components/ui/` mit Prefix `Ui` (kollidiert namentlich mit den bestehenden), oder getrenntes Verzeichnis / anderer Prefix? Was passiert mit `UiModal`/`UiConfirm`/`UiToasts`/`UiProgress` – ersetzen oder als Wrapper behalten? |
-| F5 | Wie kommen die Komponenten ins Repo: Domain `shadcn-vue.com` für die Sandbox freigeben, oder führst du das CLI lokal aus? |
-| F6 | Migrationsumfang: alles auf einmal, oder seitenweise (z.B. `login.vue` → `admin/users.vue` → `templates.vue` → `index.vue` → `lists/[id].vue`)? |
-| F7 | Icons: `@lucide/vue` aufnehmen oder ohne Icons arbeiten? |
+| ~~F5~~ | *geklärt → E-S3* |
+| F6 | Reihenfolge der Migration (durch E-S2 muss ohnehin alles migriert werden – Frage ist nur, ob in einem Commit oder in mehreren, mit Zwischenstopps zur Prüfung). |
+| F7 | Icons: heute stecken Lucide-ähnliche SVGs inline im Markup (Papierkorb, Drag-Handle u.a.). `@lucide/vue` aufnehmen und ersetzen, oder Inline-SVGs behalten? |
 | F8 | Toasts: `Sonner` (zusätzlich `vue-sonner`) oder `UiToasts` behalten und nur optisch angleichen? |
 | F9 | `admin/users.vue`: einfache `Table` oder `DataTable` mit TanStack Table? |
 | F10 | Dark Mode: mitnehmen oder bewusst weglassen? |
@@ -160,10 +160,25 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 
 ## 6. Entscheide
 
-*(noch keine – wird nach Klärung von F1–F11 gefüllt)*
+| Nr. | Entscheid | Datum |
+|---|---|---|
+| E-S1 | shadcn-vue wird eingeführt. Die Regel «Kein UI-Framework, kein CSS-Framework, keine Icon-Library» gilt für diesen Branch nicht mehr; Tailwind CSS v4 wird Styling-Basis. Bedingung: **`main` bleibt unangetastet**, die Arbeit findet ausschliesslich im Branch `shadcn-ui` statt. `CLAUDE.md` wird erst bei einem allfälligen Merge angepasst. | 2026-07-27 |
+| E-S2 | `app/assets/css/main.css` wird **ersatzlos entfernt** (harter Schnitt). Kein `@layer`-Workaround, keine Koexistenz. Damit sind sämtliche Seiten und Layouts in einem Zug zu migrieren – Zwischenstände im Branch sind ungestylt und das ist akzeptiert. | 2026-07-27 |
+| E-S3 | Die shadcn-Komponenten werden per offiziellem CLI (`shadcn-vue add …`) ins Repo geholt. Dazu wird `shadcn-vue.com` in den Netzwerk-Einstellungen der Sandbox freigegeben. | 2026-07-27 |
+
+### Konsequenz aus E-S2
+
+Der harte Schnitt betrifft alle bestehenden Klassen: `.btn`/`.btn-primary`/`.btn-danger`/`.btn-ghost`
+(62 Treffer), `.card`, `.form-field`, `.toolbar`, `.empty-state` sowie alle globalen
+Element-Regeln (`input`, `select`, `textarea`, `table`, `body`, `h1`/`h2`).
+Zusätzlich verlieren die scoped Styles in den Seiten ihre Design-Tokens
+(`--color-*`, `--space-*`, `--radius`, `--shadow`) – diese Custom Properties müssen entweder
+auf Tailwind-Theme-Tokens gemappt oder die scoped Styles mitmigriert werden. Betrifft alle
+fünf Seiten und beide Layouts.
 
 ## 7. Änderungsprotokoll
 
 | Datum | Schritt |
 |---|---|
 | 2026-07-27 | Branch `shadcn-ui` erstellt; Abklärung Integration, Dependency-Footprint, Konflikte, UI-Inventar. Kein Produktivcode geändert. |
+| 2026-07-27 | Entscheide E-S1 (shadcn-vue + Tailwind, nur im Branch), E-S2 (`main.css` harter Schnitt), E-S3 (CLI via freigegebene Domain) festgehalten. |
