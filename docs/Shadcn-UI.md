@@ -3,7 +3,7 @@
 Arbeitsdokument für den Branch `shadcn-ui`. Hält Abklärungen, Erkenntnisse, offene Fragen
 und (später) die getroffenen Entscheide fest.
 
-Status: **Abklärung – Entscheide E-S1 bis E-S6 gefällt, F7–F13 offen. Noch kein Code geändert.**
+Status: **Abklärung – Entscheide E-S1 bis E-S9 gefällt, F8–F11 und F14 offen. Noch kein Code geändert.**
 Blockiert durch: Netzwerk-Freigabe für `shadcn-vue.com` (siehe E-S3).
 
 ---
@@ -150,16 +150,17 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 | ~~F1~~ | *geklärt → E-S1* |
 | ~~F2~~ | *geklärt → E-S1* |
 | ~~F3~~ | *geklärt → E-S2* |
-| ~~F4~~ | *geklärt → E-S4* (Prefix noch offen, siehe F12) |
+| ~~F4~~ | *geklärt → E-S4, E-S9* |
 | ~~F5~~ | *geklärt → E-S3* |
 | ~~F6~~ | *geklärt → E-S6* |
-| F7 | Icons: heute stecken Lucide-ähnliche SVGs inline im Markup (Papierkorb, Drag-Handle u.a.). `@lucide/vue` aufnehmen und ersetzen, oder Inline-SVGs behalten? |
+| ~~F7~~ | *geklärt → E-S8* |
 | F8 | Toasts: `Sonner` (zusätzlich `vue-sonner`) oder `UiToasts` behalten und nur optisch angleichen? |
 | F9 | `admin/users.vue`: einfache `Table` oder `DataTable` mit TanStack Table? |
 | F10 | Dark Mode: mitnehmen oder bewusst weglassen? |
 | F11 | Wird dieser Branch nach Abschluss in `main` gemergt, oder ist das ein Experiment mit offenem Ausgang? |
-| F12 | Auto-Import-Prefix für `app/components/shadcn/`: `''` → `<Button>`, `<Dialog>` (kurz, kollidiert mit nichts) oder z.B. `'S'` → `<SButton>` (explizit erkennbar, woher die Komponente stammt)? |
-| F13 | Was geschieht mit `UiModal`/`UiConfirm`/`UiToasts`/`UiProgress` – ersatzlos löschen, oder als dünne Wrapper über den shadcn-Komponenten behalten, damit `useConfirm`/`useToast` unverändert bleiben? |
+| ~~F12~~ | *geklärt → E-S7* |
+| ~~F13~~ | *geklärt → E-S9* |
+| F14 | Folge aus E-S9: Was passiert mit den Composables `useToast` (11 Aufrufstellen) und `useConfirm` (4 Aufrufstellen)? Ebenfalls löschen und pro Aufrufstelle ausbauen, oder Composable-API beibehalten und nur das Rendering ersetzen? |
 
 ## 6. Entscheide
 
@@ -171,6 +172,9 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 | E-S4 | shadcn-Komponenten kommen in ein **eigenes Verzeichnis** `app/components/shadcn/` (`componentDir: '@/components/shadcn'`). `app/components/ui/` bleibt den projekteigenen Komponenten vorbehalten. | 2026-07-27 |
 | E-S5 | Basis-Farbe für `shadcn-vue init`: **Slate**. Die bisherige Primärfarbe `#2563eb` wird nicht übernommen; es gilt das shadcn-Standard-Theme. | 2026-07-27 |
 | E-S6 | Die Migration erfolgt in **einem einzigen Commit** (Setup + Komponenten + alle Seiten/Layouts). Keine Zwischenstopps; die Prüfung erfolgt am Gesamtresultat. | 2026-07-27 |
+| E-S7 | Auto-Import ohne Prefix: `shadcn: { prefix: '', componentDir: '@/components/shadcn' }` → `<Button>`, `<Dialog>`, `<Card>`. | 2026-07-27 |
+| E-S8 | **Keine Icon-Dependency.** Die bestehenden Inline-SVGs bleiben im Markup; `@lucide/vue` wird nicht aufgenommen. | 2026-07-27 |
+| E-S9 | `UiModal`, `UiConfirm`, `UiToasts`, `UiProgress` werden **ersatzlos gelöscht**, die Aufrufstellen auf shadcn-Komponenten umgebaut. | 2026-07-27 |
 
 ### Konsequenz aus E-S2
 
@@ -189,3 +193,4 @@ fünf Seiten und beide Layouts.
 | 2026-07-27 | Branch `shadcn-ui` erstellt; Abklärung Integration, Dependency-Footprint, Konflikte, UI-Inventar. Kein Produktivcode geändert. |
 | 2026-07-27 | Entscheide E-S1 (shadcn-vue + Tailwind, nur im Branch), E-S2 (`main.css` harter Schnitt), E-S3 (CLI via freigegebene Domain) festgehalten. |
 | 2026-07-27 | Entscheide E-S4 (eigenes Verzeichnis `app/components/shadcn/`), E-S5 (Basis-Farbe Slate), E-S6 (Migration in einem Commit) festgehalten. Domain-Freigabe steht noch aus, CLI daher noch nicht ausführbar. |
+| 2026-07-27 | Entscheide E-S7 (kein Prefix), E-S8 (keine Icon-Library), E-S9 (Ui*-Komponenten löschen) festgehalten. Neue Folgefrage F14 (Composables). |
