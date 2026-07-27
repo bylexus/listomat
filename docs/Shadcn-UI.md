@@ -3,7 +3,7 @@
 Arbeitsdokument für den Branch `shadcn-ui`. Hält Abklärungen, Erkenntnisse, offene Fragen
 und (später) die getroffenen Entscheide fest.
 
-Status: **Abklärung – Entscheide E-S1 bis E-S11 gefällt, F8/F9/F11 offen. Noch kein Code geändert.**
+Status: **Abklärung – Entscheide E-S1 bis E-S14 gefällt, offen: F15 (Widerspruch E-S11/E-S12). Noch kein Code geändert.**
 Blockiert durch: Netzwerk-Freigabe für `shadcn-vue.com` (siehe E-S3).
 
 ---
@@ -154,13 +154,14 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 | ~~F5~~ | *geklärt → E-S3* |
 | ~~F6~~ | *geklärt → E-S6* |
 | ~~F7~~ | *geklärt → E-S8* |
-| F8 | **Neu zu entscheiden.** Die gewünschte Variante «shadcn `Toast` ohne Zusatz-Dependency» existiert nicht mehr: die `Toast`-Komponente ist in shadcn-vue **deprecated**, `shadcn-vue add toast` bricht ab und legt nichts an (unovue/shadcn-vue#1167). Einziger unterstützter Weg ist `Sonner` (+ `vue-sonner`). Alternativen: Toast-Rendering selbst mit Tailwind bauen, oder die abgekündigte Toast-Quelle von Hand übernehmen. |
-| F9 | `admin/users.vue`: einfache `Table` oder `DataTable` mit TanStack Table? |
+| ~~F8~~ | *geklärt → E-S12* |
+| ~~F9~~ | *geklärt → E-S13* |
 | ~~F10~~ | *geklärt → E-S10* |
-| F11 | Wird dieser Branch nach Abschluss in `main` gemergt, oder ist das ein Experiment mit offenem Ausgang? |
+| ~~F11~~ | *geklärt → E-S14* |
 | ~~F12~~ | *geklärt → E-S7* |
 | ~~F13~~ | *geklärt → E-S9* |
-| ~~F14~~ | *geklärt → E-S11* (Toast-Seite hängt an F8) |
+| ~~F14~~ | *geklärt → E-S11* (Toast-Seite hängt an F15) |
+| F15 | **Widerspruch zwischen E-S11 und E-S12.** E-S11 verlangt, `useToast.ts` zu löschen und pro Aufrufstelle auszubauen. E-S12 verlangt einen selbstgebauten Tailwind-Toast. Ein selbstgebauter Toast braucht aber genau das, was E-S11 streicht: einen gemeinsamen State und eine global gerenderte Overlay-Komponente. Bei 11 Aufrufstellen in 5 Seiten wäre eine Inline-Lösung 11-fach dupliziert. Auflösung nötig. |
 
 ## 6. Entscheide
 
@@ -176,7 +177,10 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 | E-S8 | **Keine Icon-Dependency.** Die bestehenden Inline-SVGs bleiben im Markup; `@lucide/vue` wird nicht aufgenommen. | 2026-07-27 |
 | E-S9 | `UiModal`, `UiConfirm`, `UiToasts`, `UiProgress` werden **ersatzlos gelöscht**, die Aufrufstellen auf shadcn-Komponenten umgebaut. | 2026-07-27 |
 | E-S10 | **Kein Dark Mode.** Nur Light-Theme; kein `@nuxtjs/color-mode`, kein Klassen-Toggle. | 2026-07-27 |
-| E-S11 | Die Composables `app/composables/useToast.ts` und `app/composables/useConfirm.ts` werden **ebenfalls gelöscht**. Bestätigungsdialoge werden pro Aufrufstelle als `AlertDialog` mit lokalem State ausgebaut (4 Stellen). | 2026-07-27 |
+| E-S11 | Die Composables `app/composables/useToast.ts` und `app/composables/useConfirm.ts` werden **ebenfalls gelöscht**. Bestätigungsdialoge werden pro Aufrufstelle als `AlertDialog` mit lokalem State ausgebaut (4 Stellen). *Für die Toast-Seite steht dieser Entscheid im Konflikt mit E-S12 – siehe F15.* | 2026-07-27 |
+| E-S12 | **Kein shadcn-Toast, kein `vue-sonner`.** Das Toast-Rendering wird selbst mit Tailwind gebaut. | 2026-07-27 |
+| E-S13 | `admin/users.vue` erhält die einfache, rein visuelle `Table`-Komponente. Kein `DataTable`, kein TanStack Table. | 2026-07-27 |
+| E-S14 | Der Branch `shadcn-ui` ist ein **Experiment mit offenem Ausgang**. Ein Merge nach `main` ist nicht zugesichert; `main` und `CLAUDE.md` bleiben unangetastet. | 2026-07-27 |
 
 ### Konsequenz aus E-S2
 
@@ -197,3 +201,4 @@ fünf Seiten und beide Layouts.
 | 2026-07-27 | Entscheide E-S4 (eigenes Verzeichnis `app/components/shadcn/`), E-S5 (Basis-Farbe Slate), E-S6 (Migration in einem Commit) festgehalten. Domain-Freigabe steht noch aus, CLI daher noch nicht ausführbar. |
 | 2026-07-27 | Entscheide E-S7 (kein Prefix), E-S8 (keine Icon-Library), E-S9 (Ui*-Komponenten löschen) festgehalten. Neue Folgefrage F14 (Composables). |
 | 2026-07-27 | Entscheide E-S10 (kein Dark Mode), E-S11 (Composables löschen) festgehalten. F8 muss neu entschieden werden: shadcn-`Toast` ist deprecated. |
+| 2026-07-27 | Entscheide E-S12 (eigener Tailwind-Toast), E-S13 (einfache Table), E-S14 (Experiment) festgehalten. Widerspruch E-S11 ↔ E-S12 als F15 erfasst. |
