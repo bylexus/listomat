@@ -3,7 +3,7 @@
 Arbeitsdokument für den Branch `shadcn-ui`. Hält Abklärungen, Erkenntnisse, offene Fragen
 und (später) die getroffenen Entscheide fest.
 
-Status: **Abklärung – Entscheide E-S1 bis E-S14 gefällt, offen: F15 (Widerspruch E-S11/E-S12). Noch kein Code geändert.**
+Status: **Abklärung – Entscheide E-S1 bis E-S15 gefällt, offen: F16 (Bezugsweg der Komponenten). Noch kein Code geändert.**
 Blockiert durch: Netzwerk-Freigabe für `shadcn-vue.com` (siehe E-S3).
 
 ---
@@ -98,6 +98,35 @@ Mögliche Auflösungen (siehe offene Frage F3):
 - oder `main.css` bei der Migration schrittweise abbauen,
 - oder harter Schnitt: `main.css` sofort entfernen und alles auf einmal migrieren.
 
+### 3a. Alternativer Bezugsweg über GitHub (verifiziert)
+
+`github.com` und `codeload.github.com` stehen auf der Allowlist der Sandbox. Ein flacher Klon von
+`unovue/shadcn-vue` gelingt und enthält vollständig, was das CLI sonst über die Registry lädt:
+
+- `apps/v4/registry/new-york-v4/ui/<name>/` – Komponentenquellen (66 Komponenten)
+- `apps/v4/public/r/index.json` – Registry-Index mit `dependencies` und `registryDependencies` je Komponente
+- `apps/v4/registry/new-york-v4/lib/utils.ts` – `cn()`-Helper
+- `apps/v4/registry/base-colors.ts`, `apps/v4/public/r/themes.css` – Theme-Tokens inkl. Slate
+
+Damit lässt sich das CLI vollständig nachbilden. `components.json` wird von Hand geschrieben,
+damit ein späteres `shadcn-vue add` auf dem Entwicklerrechner weiterhin funktioniert.
+Nachteil: kein Versions-Pinning durch das CLI, der Klonstand ist manuell festzuhalten.
+
+### Tatsächlicher Dependency-Bedarf für den geplanten Komponentensatz
+
+Ermittelt aus `index.json` für `button`, `input`, `label`, `card`, `dialog`, `alert-dialog`,
+`table`, `select`, `progress`, `field`, `empty`, `separator`:
+
+`reka-ui`, `@vueuse/core`, `class-variance-authority`, `clsx`, `tailwind-merge`
+(dazu `tailwindcss`, `@tailwindcss/vite`, `shadcn-nuxt`).
+
+**Nicht** nötig – jeweils durch einen Entscheid ausgeschlossen: `@lucide/vue` (E-S8),
+`vue-sonner` (E-S12), `@tanstack/vue-table` (E-S13).
+
+Zu `@tanstack/vue-table`: Die `table`-Komponente deklariert es als Dependency, aber nur
+`table/utils.ts` importiert daraus (`valueUpdater`-Helper für `DataTable`). Die eigentlichen
+`Table*.vue` kommen ohne aus. Wird `utils.ts` weggelassen, entfällt die Dependency – passend zu E-S13.
+
 ### Namenskollision `app/components/ui/`
 
 Der shadcn-Default `componentDir: '@/components/ui'` zeigt auf genau das Verzeichnis, in dem
@@ -161,7 +190,8 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 | ~~F12~~ | *geklärt → E-S7* |
 | ~~F13~~ | *geklärt → E-S9* |
 | ~~F14~~ | *geklärt → E-S11* (Toast-Seite hängt an F15) |
-| F15 | **Widerspruch zwischen E-S11 und E-S12.** E-S11 verlangt, `useToast.ts` zu löschen und pro Aufrufstelle auszubauen. E-S12 verlangt einen selbstgebauten Tailwind-Toast. Ein selbstgebauter Toast braucht aber genau das, was E-S11 streicht: einen gemeinsamen State und eine global gerenderte Overlay-Komponente. Bei 11 Aufrufstellen in 5 Seiten wäre eine Inline-Lösung 11-fach dupliziert. Auflösung nötig. |
+| ~~F15~~ | *geklärt → E-S15.* Ursprünglicher Widerspruch: E-S11 verlangt, `useToast.ts` zu löschen und pro Aufrufstelle auszubauen. E-S12 verlangt einen selbstgebauten Tailwind-Toast. Ein selbstgebauter Toast braucht aber genau das, was E-S11 streicht: einen gemeinsamen State und eine global gerenderte Overlay-Komponente. Bei 11 Aufrufstellen in 5 Seiten wäre eine Inline-Lösung 11-fach dupliziert. Auflösung nötig. |
+| F16 | **Vorschlag zur Revision von E-S3.** Die Registry-Domain bleibt gesperrt, aber `github.com` ist freigegeben – und das Quellrepo `unovue/shadcn-vue` enthält alles, was das CLI holen würde (siehe Abschnitt 3a). Soll ich die Komponenten von dort übernehmen statt auf die Domain-Freigabe zu warten? |
 
 ## 6. Entscheide
 
@@ -181,6 +211,7 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 | E-S12 | **Kein shadcn-Toast, kein `vue-sonner`.** Das Toast-Rendering wird selbst mit Tailwind gebaut. | 2026-07-27 |
 | E-S13 | `admin/users.vue` erhält die einfache, rein visuelle `Table`-Komponente. Kein `DataTable`, kein TanStack Table. | 2026-07-27 |
 | E-S14 | Der Branch `shadcn-ui` ist ein **Experiment mit offenem Ausgang**. Ein Merge nach `main` ist nicht zugesichert; `main` und `CLAUDE.md` bleiben unangetastet. | 2026-07-27 |
+| E-S15 | Auflösung von F15: Für Toasts bleiben **ein Composable und eine global gerenderte Komponente** bestehen; nur das Rendering wird auf Tailwind umgestellt. E-S11 gilt damit **nur für `useConfirm`** – dieses wird gelöscht und die 4 Aufrufstellen als `AlertDialog` ausgebaut. | 2026-07-27 |
 
 ### Konsequenz aus E-S2
 
@@ -202,3 +233,4 @@ fünf Seiten und beide Layouts.
 | 2026-07-27 | Entscheide E-S7 (kein Prefix), E-S8 (keine Icon-Library), E-S9 (Ui*-Komponenten löschen) festgehalten. Neue Folgefrage F14 (Composables). |
 | 2026-07-27 | Entscheide E-S10 (kein Dark Mode), E-S11 (Composables löschen) festgehalten. F8 muss neu entschieden werden: shadcn-`Toast` ist deprecated. |
 | 2026-07-27 | Entscheide E-S12 (eigener Tailwind-Toast), E-S13 (einfache Table), E-S14 (Experiment) festgehalten. Widerspruch E-S11 ↔ E-S12 als F15 erfasst. |
+| 2026-07-27 | E-S15 löst F15. Alternativer Bezugsweg über GitHub verifiziert (Abschnitt 3a), als F16 zur Entscheidung gestellt. Dependency-Bedarf präzisiert. |
