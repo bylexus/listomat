@@ -3,7 +3,7 @@
 Arbeitsdokument für den Branch `shadcn-ui`. Hält Abklärungen, Erkenntnisse, offene Fragen
 und (später) die getroffenen Entscheide fest.
 
-Status: **Abklärung – Entscheide E-S1 bis E-S9 gefällt, F8–F11 und F14 offen. Noch kein Code geändert.**
+Status: **Abklärung – Entscheide E-S1 bis E-S11 gefällt, F8/F9/F11 offen. Noch kein Code geändert.**
 Blockiert durch: Netzwerk-Freigabe für `shadcn-vue.com` (siehe E-S3).
 
 ---
@@ -154,13 +154,13 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 | ~~F5~~ | *geklärt → E-S3* |
 | ~~F6~~ | *geklärt → E-S6* |
 | ~~F7~~ | *geklärt → E-S8* |
-| F8 | Toasts: `Sonner` (zusätzlich `vue-sonner`) oder `UiToasts` behalten und nur optisch angleichen? |
+| F8 | **Neu zu entscheiden.** Die gewünschte Variante «shadcn `Toast` ohne Zusatz-Dependency» existiert nicht mehr: die `Toast`-Komponente ist in shadcn-vue **deprecated**, `shadcn-vue add toast` bricht ab und legt nichts an (unovue/shadcn-vue#1167). Einziger unterstützter Weg ist `Sonner` (+ `vue-sonner`). Alternativen: Toast-Rendering selbst mit Tailwind bauen, oder die abgekündigte Toast-Quelle von Hand übernehmen. |
 | F9 | `admin/users.vue`: einfache `Table` oder `DataTable` mit TanStack Table? |
-| F10 | Dark Mode: mitnehmen oder bewusst weglassen? |
+| ~~F10~~ | *geklärt → E-S10* |
 | F11 | Wird dieser Branch nach Abschluss in `main` gemergt, oder ist das ein Experiment mit offenem Ausgang? |
 | ~~F12~~ | *geklärt → E-S7* |
 | ~~F13~~ | *geklärt → E-S9* |
-| F14 | Folge aus E-S9: Was passiert mit den Composables `useToast` (11 Aufrufstellen) und `useConfirm` (4 Aufrufstellen)? Ebenfalls löschen und pro Aufrufstelle ausbauen, oder Composable-API beibehalten und nur das Rendering ersetzen? |
+| ~~F14~~ | *geklärt → E-S11* (Toast-Seite hängt an F8) |
 
 ## 6. Entscheide
 
@@ -175,6 +175,8 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 | E-S7 | Auto-Import ohne Prefix: `shadcn: { prefix: '', componentDir: '@/components/shadcn' }` → `<Button>`, `<Dialog>`, `<Card>`. | 2026-07-27 |
 | E-S8 | **Keine Icon-Dependency.** Die bestehenden Inline-SVGs bleiben im Markup; `@lucide/vue` wird nicht aufgenommen. | 2026-07-27 |
 | E-S9 | `UiModal`, `UiConfirm`, `UiToasts`, `UiProgress` werden **ersatzlos gelöscht**, die Aufrufstellen auf shadcn-Komponenten umgebaut. | 2026-07-27 |
+| E-S10 | **Kein Dark Mode.** Nur Light-Theme; kein `@nuxtjs/color-mode`, kein Klassen-Toggle. | 2026-07-27 |
+| E-S11 | Die Composables `app/composables/useToast.ts` und `app/composables/useConfirm.ts` werden **ebenfalls gelöscht**. Bestätigungsdialoge werden pro Aufrufstelle als `AlertDialog` mit lokalem State ausgebaut (4 Stellen). | 2026-07-27 |
 
 ### Konsequenz aus E-S2
 
@@ -194,3 +196,4 @@ fünf Seiten und beide Layouts.
 | 2026-07-27 | Entscheide E-S1 (shadcn-vue + Tailwind, nur im Branch), E-S2 (`main.css` harter Schnitt), E-S3 (CLI via freigegebene Domain) festgehalten. |
 | 2026-07-27 | Entscheide E-S4 (eigenes Verzeichnis `app/components/shadcn/`), E-S5 (Basis-Farbe Slate), E-S6 (Migration in einem Commit) festgehalten. Domain-Freigabe steht noch aus, CLI daher noch nicht ausführbar. |
 | 2026-07-27 | Entscheide E-S7 (kein Prefix), E-S8 (keine Icon-Library), E-S9 (Ui*-Komponenten löschen) festgehalten. Neue Folgefrage F14 (Composables). |
+| 2026-07-27 | Entscheide E-S10 (kein Dark Mode), E-S11 (Composables löschen) festgehalten. F8 muss neu entschieden werden: shadcn-`Toast` ist deprecated. |
