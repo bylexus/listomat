@@ -1,128 +1,140 @@
 <template>
   <div v-if="list">
-    <div class="page-header toolbar">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
       <h1
         v-if="list.isOwner"
-        class="list-title"
+        class="rounded-md px-1.5 py-0.5 text-xl font-bold focus:ring-3 focus:ring-ring/50 focus:outline-none"
         contenteditable="true"
         spellcheck="false"
         @blur="onRenameList($event)"
         @keydown.enter.prevent="blurTarget($event)"
       >{{ list.name }}</h1>
-      <h1 v-else class="list-title">{{ list.name }}</h1>
+      <h1 v-else class="px-1.5 py-0.5 text-xl font-bold">{{ list.name }}</h1>
 
-      <div class="toolbar">
-        <button class="btn btn-primary" type="button" @click="openGroupDialog">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="flex flex-wrap items-center gap-2">
+        <Button @click="openGroupDialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M12 5v14M5 12h14" stroke-linecap="round" />
           </svg>
           {{ t('listDetail.newGroup') }}
-        </button>
-        <button class="btn" type="button" :title="t('listDetail.reset')" @click="confirmReset">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        </Button>
+        <Button variant="outline" :title="t('listDetail.reset')" @click="resetDialogOpen = true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           {{ t('listDetail.reset') }}
-        </button>
-        <button class="btn" type="button" :title="t('listDetail.duplicate')" @click="duplicateList">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        </Button>
+        <Button variant="outline" :title="t('listDetail.duplicate')" @click="duplicateList">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <rect x="9" y="9" width="12" height="12" rx="2" />
             <path d="M5 15V5a2 2 0 0 1 2-2h10" stroke-linecap="round" />
           </svg>
           {{ t('listDetail.duplicate') }}
-        </button>
-        <button class="btn" type="button" :title="t('listDetail.export')" @click="openExportDialog">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        </Button>
+        <Button variant="outline" :title="t('listDetail.export')" @click="openExportDialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M12 3v12M7 10l5 5 5-5M5 21h14" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           {{ t('listDetail.export') }}
-        </button>
-        <button v-if="list.isOwner" class="btn" type="button" :title="t('listDetail.share')" @click="openShareDialog">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        </Button>
+        <Button v-if="list.isOwner" variant="outline" :title="t('listDetail.share')" @click="openShareDialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <circle cx="18" cy="5" r="3" />
             <circle cx="6" cy="12" r="3" />
             <circle cx="18" cy="19" r="3" />
             <path d="M8.6 10.6l6.8-3.2M8.6 13.4l6.8 3.2" />
           </svg>
           {{ t('listDetail.share') }}
-        </button>
+        </Button>
       </div>
     </div>
 
-    <p v-if="list.groups.length === 0" class="empty-state">{{ t('listDetail.empty') }}</p>
+    <p v-if="list.groups.length === 0" class="py-6 text-muted-foreground">{{ t('listDetail.empty') }}</p>
 
     <VueDraggable
       v-else
       v-model="list.groups"
-      class="groups-grid"
+      class="grid grid-cols-1 gap-4 md:grid-cols-2"
       :animation="150"
       handle=".group-drag-handle"
       @end="onGroupDragEnd"
     >
-      <div v-for="group in list.groups" :key="group.id" class="card group-card">
-        <div class="group-card-header">
-          <span class="drag-handle group-drag-handle" :title="t('listDetail.dragGroup')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <Card v-for="group in list.groups" :key="group.id" class="gap-2 p-4">
+        <div class="flex items-center gap-2">
+          <span
+            class="group-drag-handle inline-flex shrink-0 cursor-grab text-muted-foreground"
+            :title="t('listDetail.dragGroup')"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4" aria-hidden="true">
               <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
             </svg>
           </span>
           <h3
-            class="group-name"
+            class="-mx-1.5 -my-0.5 flex-1 rounded-md px-1.5 py-0.5 text-base font-semibold focus:ring-3 focus:ring-ring/50 focus:outline-none"
             contenteditable="true"
             spellcheck="false"
             @blur="onRenameGroup(group, $event)"
             @keydown.enter.prevent="blurTarget($event)"
           >{{ group.name }}</h3>
-          <span class="group-progress">{{ doneCount(group) }}/{{ group.entries.length }}</span>
-          <button
-            class="btn btn-ghost"
-            type="button"
+          <span class="text-sm text-muted-foreground tabular-nums">
+            {{ doneCount(group) }}/{{ group.entries.length }}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon-sm"
             :title="t('listDetail.saveAsTemplate')"
             @click="saveAsTemplate(group)"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" stroke-linejoin="round" />
             </svg>
-          </button>
-          <button class="btn btn-ghost" type="button" :title="t('listDetail.deleteGroup')" @click="confirmDeleteGroup(group)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            :title="t('listDetail.deleteGroup')"
+            @click="askDeleteGroup(group)"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <VueDraggable
           v-model="group.entries"
-          class="entry-list"
+          class="flex min-h-2 flex-col gap-1"
           group="entries"
           :animation="150"
           handle=".entry-drag-handle"
           @update="onEntryReorder(group)"
           @add="onEntryMovedIn(group)"
         >
-          <div v-for="entry in group.entries" :key="entry.id" class="entry-row">
-            <span class="drag-handle entry-drag-handle" :title="t('listDetail.dragEntry')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <div v-for="entry in group.entries" :key="entry.id" class="flex items-center gap-2">
+            <span
+              class="entry-drag-handle inline-flex shrink-0 cursor-grab text-muted-foreground"
+              :title="t('listDetail.dragEntry')"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-3.5" aria-hidden="true">
                 <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
               </svg>
             </span>
-            <input
-              type="checkbox"
-              class="entry-done"
-              :checked="entry.done"
-              @change="onToggleDone(group, entry, $event)"
+            <Checkbox
+              :model-value="entry.done"
+              :aria-label="entry.name"
+              @update:model-value="(value) => onToggleDone(group, entry, value === true)"
             />
-            <div class="entry-texts">
+            <div class="flex min-w-0 flex-1 flex-col gap-0.5">
               <span
-                class="entry-name"
-                :class="{ done: entry.done }"
+                class="-mx-1.5 rounded-md px-1.5 py-0.5 text-sm focus:ring-3 focus:ring-ring/50 focus:outline-none"
+                :class="entry.done ? 'text-muted-foreground line-through' : ''"
                 contenteditable="true"
                 spellcheck="false"
                 @blur="onEntryNameBlur(group, entry, $event)"
                 @keydown.enter.prevent="blurTarget($event)"
               >{{ entry.name }}</span>
-              <input
-                class="entry-comment"
+              <Input
+                class="h-8 text-muted-foreground italic"
                 type="text"
                 :value="entry.comment ?? ''"
                 :placeholder="t('listDetail.commentPlaceholder')"
@@ -130,95 +142,165 @@
                 @keydown.enter.prevent="blurTarget($event)"
               />
             </div>
-            <button class="btn btn-ghost" type="button" :title="t('listDetail.deleteEntry')" @click="deleteEntry(group, entry)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              :title="t('listDetail.deleteEntry')"
+              @click="deleteEntry(group, entry)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-            </button>
+            </Button>
           </div>
         </VueDraggable>
 
-        <input
+        <Input
           v-model="newEntryDrafts[group.id]"
           type="text"
-          class="entry-add-input"
+          class="border-dashed"
           :placeholder="t('listDetail.addEntryPlaceholder')"
           @keydown.enter.prevent="addEntry(group)"
         />
-      </div>
+      </Card>
     </VueDraggable>
 
-    <UiModal :open="groupDialogOpen" @close="groupDialogOpen = false">
-      <template #header>{{ t('listDetail.newGroupTitle') }}</template>
-      <div class="form-field">
-        <label>{{ t('listDetail.groupNameLabel') }}</label>
-        <div class="dialog-row">
-          <input v-model="newGroupName" type="text" @keydown.enter.prevent="createGroup" />
-          <button class="btn btn-primary" type="button" :disabled="!newGroupName.trim()" @click="createGroup">
-            {{ t('listDetail.create') }}
-          </button>
+    <Dialog v-model:open="groupDialogOpen">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{{ t('listDetail.newGroupTitle') }}</DialogTitle>
+        </DialogHeader>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
+            <Label for="d-groupname">{{ t('listDetail.groupNameLabel') }}</Label>
+            <div class="flex items-center gap-2">
+              <Input id="d-groupname" v-model="newGroupName" type="text" @keydown.enter.prevent="createGroup" />
+              <Button :disabled="!newGroupName.trim()" @click="createGroup">
+                {{ t('listDetail.create') }}
+              </Button>
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <Label for="d-template">{{ t('listDetail.orFromTemplate') }}</Label>
+            <p v-if="templates.length === 0" class="text-muted-foreground">
+              {{ t('listDetail.noTemplates') }}
+            </p>
+            <div v-else class="flex items-center gap-2">
+              <NativeSelect id="d-template" v-model="selectedTemplateId" class="w-full">
+                <option v-for="tpl in templates" :key="tpl.id" :value="tpl.id">{{ tpl.name }}</option>
+              </NativeSelect>
+              <Button :disabled="!selectedTemplateId" @click="insertTemplate">
+                {{ t('listDetail.insert') }}
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="form-field">
-        <label>{{ t('listDetail.orFromTemplate') }}</label>
-        <p v-if="templates.length === 0" class="empty-state">{{ t('listDetail.noTemplates') }}</p>
-        <div v-else class="dialog-row">
-          <select v-model="selectedTemplateId">
-            <option v-for="tpl in templates" :key="tpl.id" :value="tpl.id">{{ tpl.name }}</option>
-          </select>
-          <button class="btn btn-primary" type="button" :disabled="!selectedTemplateId" @click="insertTemplate">
-            {{ t('listDetail.insert') }}
-          </button>
-        </div>
-      </div>
-    </UiModal>
+      </DialogContent>
+    </Dialog>
 
-    <UiModal v-if="list.isOwner" :open="shareDialogOpen" @close="shareDialogOpen = false">
-      <template #header>{{ t('listDetail.shareTitle') }}</template>
-      <div class="form-field">
-        <label>{{ t('listDetail.shareEmailLabel') }}</label>
-        <div class="dialog-row">
-          <input v-model="newShareEmail" type="email" @keydown.enter.prevent="addShare" />
-          <button class="btn btn-primary" type="button" :disabled="!newShareEmail.trim()" @click="addShare">
-            {{ t('listDetail.shareAdd') }}
-          </button>
+    <Dialog v-if="list.isOwner" v-model:open="shareDialogOpen">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{{ t('listDetail.shareTitle') }}</DialogTitle>
+        </DialogHeader>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
+            <Label for="d-shareemail">{{ t('listDetail.shareEmailLabel') }}</Label>
+            <div class="flex items-center gap-2">
+              <Input id="d-shareemail" v-model="newShareEmail" type="email" @keydown.enter.prevent="addShare" />
+              <Button :disabled="!newShareEmail.trim()" @click="addShare">
+                {{ t('listDetail.shareAdd') }}
+              </Button>
+            </div>
+          </div>
+          <p v-if="!list.shares || list.shares.length === 0" class="text-muted-foreground">
+            {{ t('listDetail.noShares') }}
+          </p>
+          <ul v-else class="flex flex-col divide-y">
+            <li v-for="share in list.shares" :key="share.id" class="flex items-center justify-between gap-2 py-1">
+              <span class="text-sm">{{ share.email }}</span>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                :title="t('listDetail.removeShare')"
+                @click="removeShare(share)"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </Button>
+            </li>
+          </ul>
         </div>
-      </div>
-      <div class="form-field">
-        <p v-if="!list.shares || list.shares.length === 0" class="empty-state">{{ t('listDetail.noShares') }}</p>
-        <ul v-else class="share-list">
-          <li v-for="share in list.shares" :key="share.id" class="share-row">
-            <span>{{ share.email }}</span>
-            <button class="btn btn-ghost" type="button" :title="t('listDetail.removeShare')" @click="removeShare(share)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </button>
-          </li>
-        </ul>
-      </div>
-    </UiModal>
+      </DialogContent>
+    </Dialog>
 
-    <UiModal :open="exportDialogOpen" @close="exportDialogOpen = false">
-      <template #header>{{ t('listDetail.exportTitle') }}</template>
-      <div class="form-field">
-        <label>{{ t('listDetail.formatLabel') }}</label>
-        <div class="radio-row">
-          <label class="radio-option"><input v-model="exportFormat" type="radio" value="pdf" /> {{ t('listDetail.formatPdf') }}</label>
-          <label class="radio-option"><input v-model="exportFormat" type="radio" value="xlsx" /> {{ t('listDetail.formatExcel') }}</label>
+    <Dialog v-model:open="exportDialogOpen">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{{ t('listDetail.exportTitle') }}</DialogTitle>
+        </DialogHeader>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
+            <Label>{{ t('listDetail.formatLabel') }}</Label>
+            <div class="flex flex-wrap gap-4">
+              <Label class="font-normal">
+                <input v-model="exportFormat" type="radio" value="pdf" class="accent-primary" />
+                {{ t('listDetail.formatPdf') }}
+              </Label>
+              <Label class="font-normal">
+                <input v-model="exportFormat" type="radio" value="xlsx" class="accent-primary" />
+                {{ t('listDetail.formatExcel') }}
+              </Label>
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <Label>{{ t('listDetail.statusLabel') }}</Label>
+            <div class="flex flex-wrap gap-4">
+              <Label class="font-normal">
+                <input v-model="exportStatus" type="radio" value="current" class="accent-primary" />
+                {{ t('listDetail.statusCurrent') }}
+              </Label>
+              <Label class="font-normal">
+                <input v-model="exportStatus" type="radio" value="empty" class="accent-primary" />
+                {{ t('listDetail.statusEmpty') }}
+              </Label>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="form-field">
-        <label>{{ t('listDetail.statusLabel') }}</label>
-        <div class="radio-row">
-          <label class="radio-option"><input v-model="exportStatus" type="radio" value="current" /> {{ t('listDetail.statusCurrent') }}</label>
-          <label class="radio-option"><input v-model="exportStatus" type="radio" value="empty" /> {{ t('listDetail.statusEmpty') }}</label>
-        </div>
-      </div>
-      <template #footer>
-        <button class="btn btn-primary" type="button" @click="runExport">{{ t('listDetail.exportAction') }}</button>
-      </template>
-    </UiModal>
+        <DialogFooter>
+          <Button @click="runExport">{{ t('listDetail.exportAction') }}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <AlertDialog v-model:open="deleteGroupDialogOpen">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{{ t('confirm.title') }}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {{ groupToDelete ? t('listDetail.deleteGroupConfirm', { name: groupToDelete.name }) : '' }}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{{ t('confirm.cancel') }}</AlertDialogCancel>
+          <AlertDialogAction @click="deleteGroup">{{ t('confirm.ok') }}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
+    <AlertDialog v-model:open="resetDialogOpen">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{{ t('confirm.title') }}</AlertDialogTitle>
+          <AlertDialogDescription>{{ t('listDetail.resetConfirm') }}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{{ t('confirm.cancel') }}</AlertDialogCancel>
+          <AlertDialogAction @click="resetList">{{ t('confirm.ok') }}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>
 
@@ -265,7 +347,6 @@ interface ListDetail {
 
 const { t } = useI18n()
 const { call } = useApi()
-const { confirm } = useConfirm()
 const route = useRoute()
 const router = useRouter()
 
@@ -284,6 +365,10 @@ const newShareEmail = ref('')
 const exportDialogOpen = ref(false)
 const exportFormat = ref<'pdf' | 'xlsx'>('pdf')
 const exportStatus = ref<'current' | 'empty'>('current')
+
+const deleteGroupDialogOpen = ref(false)
+const groupToDelete = ref<ListGroup | null>(null)
+const resetDialogOpen = ref(false)
 
 function blurTarget(event: Event) {
   ;(event.target as HTMLElement).blur()
@@ -378,14 +463,20 @@ async function onRenameGroup(group: ListGroup, event: FocusEvent) {
   }
 }
 
-async function confirmDeleteGroup(group: ListGroup) {
-  const ok = await confirm(t('listDetail.deleteGroupConfirm', { name: group.name }))
-  if (!ok || !list.value) return
+function askDeleteGroup(group: ListGroup) {
+  groupToDelete.value = group
+  deleteGroupDialogOpen.value = true
+}
+
+async function deleteGroup() {
+  const group = groupToDelete.value
+  if (!group || !list.value) return
   const result = await call(() => $fetch(`/api/lists/${listId}/groups/${group.id}`, { method: 'DELETE' }))
   if (result) {
     list.value.groups = list.value.groups.filter((g) => g.id !== group.id)
     delete newEntryDrafts[group.id]
   }
+  groupToDelete.value = null
 }
 
 async function saveAsTemplate(group: ListGroup) {
@@ -419,20 +510,15 @@ async function addEntry(group: ListGroup) {
   }
 }
 
-async function onToggleDone(group: ListGroup, entry: ListEntry, event: Event) {
-  const el = event.target as HTMLInputElement
-  const done = el.checked
+async function onToggleDone(group: ListGroup, entry: ListEntry, done: boolean) {
   const result = await call(() =>
     $fetch<ListEntry>(`/api/lists/${listId}/groups/${group.id}/entries/${entry.id}`, {
       method: 'PATCH',
       body: { done }
     })
   )
-  if (result) {
-    entry.done = result.done
-  } else {
-    el.checked = entry.done
-  }
+  // Bei Fehler bleibt entry.done unverändert; die Checkbox rendert wieder aus dem Prop.
+  if (result) entry.done = result.done
 }
 
 async function onEntryNameBlur(group: ListGroup, entry: ListEntry, event: FocusEvent) {
@@ -510,9 +596,8 @@ async function onEntryMovedIn(group: ListGroup) {
 
 // --- Toolbar ---
 
-async function confirmReset() {
-  const ok = await confirm(t('listDetail.resetConfirm'))
-  if (!ok || !list.value) return
+async function resetList() {
+  if (!list.value) return
   const result = await call(() => $fetch(`/api/lists/${listId}/reset`, { method: 'POST' }))
   if (result) {
     for (const group of list.value.groups) {
@@ -580,142 +665,3 @@ function runExport() {
 onMounted(loadList)
 </script>
 
-<style scoped>
-.page-header {
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin-bottom: var(--space-3);
-}
-.list-title {
-  margin: 0;
-  padding: 2px 6px;
-  border-radius: var(--radius);
-}
-.list-title[contenteditable]:focus {
-  outline: 2px solid var(--color-primary);
-}
-.empty-state {
-  color: var(--color-text-muted);
-}
-.groups-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-3);
-  align-items: start;
-}
-@media (min-width: 768px) {
-  .groups-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-.group-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-.group-card-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-.drag-handle {
-  cursor: grab;
-  color: var(--color-text-muted);
-  display: inline-flex;
-  touch-action: none;
-}
-.group-name {
-  flex: 1;
-  margin: 0;
-  font-size: 1.05rem;
-  padding: 2px 4px;
-  border-radius: var(--radius);
-}
-.group-name[contenteditable]:focus {
-  outline: 2px solid var(--color-primary);
-}
-.group-progress {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  white-space: nowrap;
-}
-.entry-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-.entry-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-.entry-done {
-  flex-shrink: 0;
-}
-.entry-texts {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-.entry-name {
-  padding: 1px 4px;
-  border-radius: var(--radius);
-}
-.entry-name.done {
-  text-decoration: line-through;
-  color: var(--color-text-muted);
-}
-.entry-name[contenteditable]:focus {
-  outline: 2px solid var(--color-primary);
-}
-.entry-comment {
-  font-size: 0.8rem;
-  border: none;
-  padding: 1px 4px;
-  background: transparent;
-  color: var(--color-text-muted);
-}
-.entry-comment:focus {
-  outline: 2px solid var(--color-primary);
-}
-.entry-add-input {
-  border: none;
-  background: transparent;
-  padding: var(--space-1) 4px;
-}
-.dialog-row {
-  display: flex;
-  gap: var(--space-2);
-}
-.dialog-row input,
-.dialog-row select {
-  flex: 1;
-  min-width: 0;
-}
-.share-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-.share-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  padding: 2px 4px;
-}
-.radio-row {
-  display: flex;
-  gap: var(--space-3);
-}
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: normal;
-}
-</style>

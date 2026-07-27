@@ -1,96 +1,139 @@
 <template>
   <div>
-    <div class="page-header toolbar">
-      <h1>{{ t('nav.templates') }}</h1>
-      <button class="btn btn-primary" type="button" @click="addGroup">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+      <h1 class="text-xl font-bold">{{ t('nav.templates') }}</h1>
+      <Button @click="addGroup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M12 5v14M5 12h14" stroke-linecap="round" />
         </svg>
         {{ t('templates.newGroup') }}
-      </button>
+      </Button>
     </div>
 
-    <p v-if="loading" class="empty-state">…</p>
-    <p v-else-if="groupList.length === 0" class="empty-state">{{ t('templates.empty') }}</p>
+    <p v-if="loading" class="py-6 text-muted-foreground">…</p>
+    <p v-else-if="groupList.length === 0" class="py-6 text-muted-foreground">
+      {{ t('templates.empty') }}
+    </p>
 
     <VueDraggable
       v-else
       v-model="groupList"
-      class="groups-grid"
+      class="grid grid-cols-1 gap-4 md:grid-cols-2"
       :animation="150"
       handle=".group-drag-handle"
       @end="onGroupDragEnd"
     >
-      <div v-for="group in groupList" :key="group.id" class="card group-card">
-        <div class="group-card-header">
-          <span class="drag-handle group-drag-handle" :title="t('templates.dragGroup')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <Card v-for="group in groupList" :key="group.id" class="gap-2 p-4">
+        <div class="flex items-center gap-2">
+          <span
+            class="group-drag-handle inline-flex shrink-0 cursor-grab text-muted-foreground"
+            :title="t('templates.dragGroup')"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="size-4"
+              aria-hidden="true"
+            >
               <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
             </svg>
           </span>
           <h3
-            class="group-name"
+            class="-mx-1.5 -my-0.5 flex-1 rounded-md px-1.5 py-0.5 text-base font-semibold focus:ring-3 focus:ring-ring/50 focus:outline-none"
             contenteditable="true"
             spellcheck="false"
             @blur="onRenameGroup(group, $event)"
             @keydown.enter.prevent="blurTarget($event)"
           >{{ group.name }}</h3>
-          <button class="btn btn-ghost" type="button" :title="t('templates.deleteGroup')" @click="confirmDeleteGroup(group)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path
-                d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            :title="t('templates.deleteGroup')"
+            @click="askDeleteGroup(group)"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <VueDraggable
           v-model="group.entries"
-          class="entry-list"
+          class="flex min-h-2 flex-col gap-1"
           :animation="150"
           handle=".entry-drag-handle"
           @end="onEntryDragEnd(group)"
         >
-          <div v-for="entry in group.entries" :key="entry.id" class="entry-row">
-            <span class="drag-handle entry-drag-handle" :title="t('templates.dragEntry')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <div v-for="entry in group.entries" :key="entry.id" class="flex items-center gap-2">
+            <span
+              class="entry-drag-handle inline-flex shrink-0 cursor-grab text-muted-foreground"
+              :title="t('templates.dragEntry')"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                class="size-3.5"
+                aria-hidden="true"
+              >
                 <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
               </svg>
             </span>
             <span
-              class="entry-name"
+              class="flex-2 rounded-md px-1.5 py-0.5 text-sm focus:ring-3 focus:ring-ring/50 focus:outline-none"
               contenteditable="true"
               spellcheck="false"
               @blur="onEntryNameBlur(group, entry, $event)"
               @keydown.enter.prevent="blurTarget($event)"
             >{{ entry.name }}</span>
-            <input
-              class="entry-comment"
+            <Input
+              class="h-8 flex-2 text-muted-foreground italic"
               type="text"
               :value="entry.comment ?? ''"
               :placeholder="t('templates.commentPlaceholder')"
               @blur="onEntryCommentBlur(group, entry, $event)"
               @keydown.enter.prevent="blurTarget($event)"
             />
-            <button class="btn btn-ghost" type="button" :title="t('templates.deleteEntry')" @click="deleteEntry(group, entry)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              :title="t('templates.deleteEntry')"
+              @click="deleteEntry(group, entry)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-            </button>
+            </Button>
           </div>
         </VueDraggable>
 
-        <input
+        <Input
           v-model="newEntryDrafts[group.id]"
           type="text"
-          class="entry-add-input"
+          class="border-dashed"
           :placeholder="t('templates.addEntryPlaceholder')"
           @keydown.enter.prevent="addEntry(group)"
         />
-      </div>
+      </Card>
     </VueDraggable>
+
+    <AlertDialog v-model:open="deleteDialogOpen">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{{ t('confirm.title') }}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {{ groupToDelete ? t('templates.deleteGroupConfirm', { name: groupToDelete.name }) : '' }}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{{ t('confirm.cancel') }}</AlertDialogCancel>
+          <AlertDialogAction @click="deleteGroup">{{ t('confirm.ok') }}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>
 
@@ -121,11 +164,13 @@ interface TemplateGroup {
 
 const { t } = useI18n()
 const { call } = useApi()
-const { confirm } = useConfirm()
 
 const groupList = ref<TemplateGroup[]>([])
 const loading = ref(false)
 const newEntryDrafts = reactive<Record<string, string>>({})
+
+const deleteDialogOpen = ref(false)
+const groupToDelete = ref<TemplateGroup | null>(null)
 
 function blurTarget(event: Event) {
   ;(event.target as HTMLElement).blur()
@@ -163,14 +208,20 @@ async function onRenameGroup(group: TemplateGroup, event: FocusEvent) {
   }
 }
 
-async function confirmDeleteGroup(group: TemplateGroup) {
-  const ok = await confirm(t('templates.deleteGroupConfirm', { name: group.name }))
-  if (!ok) return
+function askDeleteGroup(group: TemplateGroup) {
+  groupToDelete.value = group
+  deleteDialogOpen.value = true
+}
+
+async function deleteGroup() {
+  const group = groupToDelete.value
+  if (!group) return
   const result = await call(() => $fetch(`/api/templates/${group.id}`, { method: 'DELETE' }))
   if (result) {
     groupList.value = groupList.value.filter((g) => g.id !== group.id)
     delete newEntryDrafts[group.id]
   }
+  groupToDelete.value = null
 }
 
 async function onGroupDragEnd() {
@@ -237,95 +288,3 @@ async function onEntryDragEnd(group: TemplateGroup) {
 onMounted(loadTemplates)
 </script>
 
-<style scoped>
-.page-header {
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.empty-state {
-  color: var(--color-text-muted);
-  padding: var(--space-4) 0;
-}
-
-.groups-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-3);
-}
-
-@media (min-width: 768px) {
-  .groups-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.group-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.group-card-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.group-name {
-  flex: 1;
-  font-size: 1.05rem;
-  font-weight: 600;
-  outline: none;
-  border-radius: var(--radius);
-  padding: 0.15rem 0.35rem;
-  margin: -0.15rem -0.35rem;
-}
-
-.group-name:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: -1px;
-}
-
-.drag-handle {
-  color: var(--color-text-muted);
-  cursor: grab;
-  display: inline-flex;
-  flex-shrink: 0;
-}
-
-.entry-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  min-height: 0.5rem;
-}
-
-.entry-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.entry-name {
-  flex: 2;
-  padding: 0.15rem 0.35rem;
-  border-radius: var(--radius);
-  outline: none;
-}
-
-.entry-name:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: -1px;
-}
-
-.entry-comment {
-  flex: 2;
-  color: var(--color-text-muted);
-  font-style: italic;
-}
-
-.entry-add-input {
-  border-style: dashed;
-}
-</style>

@@ -6,7 +6,8 @@
     "lists": "Listen",
     "templates": "Vorlagen",
     "admin": "Administration",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "language": "Sprache"
   },
   "auth": {
     "email": "E-Mail",
@@ -110,5 +111,8 @@
     "statusCurrent": "Aktueller Stand",
     "statusEmpty": "Leer (zum Abhaken)",
     "exportAction": "Herunterladen"
+  },
+  "toast": {
+    "dismiss": "Schliessen"
   }
 }

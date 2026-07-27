@@ -1,142 +1,151 @@
 <template>
   <div>
-    <div class="page-header toolbar">
-      <h1>{{ t('nav.admin') }}</h1>
-      <button class="btn btn-primary" type="button" @click="openCreate">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+      <h1 class="text-xl font-bold">{{ t('nav.admin') }}</h1>
+      <Button @click="openCreate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M12 5v14M5 12h14" stroke-linecap="round" />
         </svg>
         {{ t('admin.newUser') }}
-      </button>
+      </Button>
     </div>
 
-    <div class="card table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>{{ t('admin.email') }}</th>
-            <th>{{ t('admin.firstName') }} / {{ t('admin.lastName') }}</th>
-            <th>{{ t('admin.role') }}</th>
-            <th>{{ t('admin.active') }}</th>
-            <th>{{ t('admin.lastLogin') }}</th>
-            <th>{{ t('admin.actions') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="loading">
-            <td colspan="6">…</td>
-          </tr>
-          <tr v-for="row in userList" v-else :key="row.id">
-            <td>{{ row.email }}</td>
-            <td>{{ row.firstName }} {{ row.lastName }}</td>
-            <td>{{ row.role === 'admin' ? t('admin.roleAdmin') : t('admin.roleUser') }}</td>
-            <td>
-              <span class="badge" :class="row.active ? 'badge-success' : 'badge-danger'">
+    <Card class="overflow-x-auto p-0">
+      <Table class="min-w-160">
+        <TableHeader>
+          <TableRow>
+            <TableHead>{{ t('admin.email') }}</TableHead>
+            <TableHead>{{ t('admin.firstName') }} / {{ t('admin.lastName') }}</TableHead>
+            <TableHead>{{ t('admin.role') }}</TableHead>
+            <TableHead>{{ t('admin.active') }}</TableHead>
+            <TableHead>{{ t('admin.lastLogin') }}</TableHead>
+            <TableHead>{{ t('admin.actions') }}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow v-if="loading">
+            <TableCell colspan="6">…</TableCell>
+          </TableRow>
+          <TableRow v-for="row in userList" v-else :key="row.id">
+            <TableCell>{{ row.email }}</TableCell>
+            <TableCell>{{ row.firstName }} {{ row.lastName }}</TableCell>
+            <TableCell>{{ row.role === 'admin' ? t('admin.roleAdmin') : t('admin.roleUser') }}</TableCell>
+            <TableCell>
+              <Badge :variant="row.active ? 'default' : 'destructive'">
                 {{ row.active ? t('admin.activeYes') : t('admin.activeNo') }}
-              </span>
-            </td>
-            <td>{{ formatDate(row.lastLoginAt) }}</td>
-            <td>
-              <div class="row-actions">
-                <button class="btn btn-ghost" type="button" :title="t('admin.editUser')" @click="openEdit(row)">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              </Badge>
+            </TableCell>
+            <TableCell>{{ formatDate(row.lastLoginAt) }}</TableCell>
+            <TableCell>
+              <div class="flex gap-1">
+                <Button variant="ghost" size="icon-sm" :title="t('admin.editUser')" @click="openEdit(row)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path
                       d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
                       stroke-linecap="round"
                       stroke-linejoin="round"
                     />
                   </svg>
-                </button>
-                <button
-                  class="btn btn-ghost"
-                  type="button"
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
                   :disabled="row.id === currentUser?.id"
                   :title="row.active ? t('admin.activeNo') : t('admin.activeYes')"
                   @click="toggleActive(row)"
                 >
                   <svg
                     v-if="row.active"
-                    width="18"
-                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
+                    aria-hidden="true"
                   >
                     <circle cx="12" cy="12" r="9" />
                     <path d="M4.9 4.9l14.2 14.2" stroke-linecap="round" />
                   </svg>
-                  <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
-                </button>
-                <button class="btn btn-ghost" type="button" :title="t('admin.setPassword')" @click="openPassword(row)">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                </Button>
+                <Button variant="ghost" size="icon-sm" :title="t('admin.setPassword')" @click="openPassword(row)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <circle cx="8" cy="15" r="4" />
                     <path d="M10.5 12.5 20 3M17 6l2 2M14 9l2 2" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
-                </button>
-                <button
-                  class="btn btn-ghost"
-                  type="button"
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
                   :disabled="row.id === currentUser?.id || !row.active"
                   :title="t('admin.impersonate')"
                   @click="impersonate(row)"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <circle cx="12" cy="8" r="4" />
                     <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke-linecap="round" />
                   </svg>
-                </button>
+                </Button>
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </Card>
 
-    <UiModal :open="editDialogVisible" @close="editDialogVisible = false">
-      <template #header>{{ editingId ? t('admin.editUser') : t('admin.newUser') }}</template>
-      <div class="form-field">
-        <label for="f-email">{{ t('admin.email') }}</label>
-        <input id="f-email" v-model="form.email" type="email" />
-      </div>
-      <div class="form-field">
-        <label for="f-first">{{ t('admin.firstName') }}</label>
-        <input id="f-first" v-model="form.firstName" type="text" />
-      </div>
-      <div class="form-field">
-        <label for="f-last">{{ t('admin.lastName') }}</label>
-        <input id="f-last" v-model="form.lastName" type="text" />
-      </div>
-      <div v-if="!editingId" class="form-field">
-        <label for="f-pw">{{ t('admin.password') }}</label>
-        <input id="f-pw" v-model="form.password" type="password" />
-      </div>
-      <div v-if="editingId" class="form-field">
-        <label for="f-role">{{ t('admin.role') }}</label>
-        <select id="f-role" v-model="form.role">
-          <option value="user">{{ t('admin.roleUser') }}</option>
-          <option value="admin">{{ t('admin.roleAdmin') }}</option>
-        </select>
-      </div>
-      <template #footer>
-        <button class="btn" type="button" @click="editDialogVisible = false">{{ t('admin.cancel') }}</button>
-        <button class="btn btn-primary" type="button" :disabled="saving" @click="saveUser">{{ t('admin.save') }}</button>
-      </template>
-    </UiModal>
+    <Dialog v-model:open="editDialogVisible">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{{ editingId ? t('admin.editUser') : t('admin.newUser') }}</DialogTitle>
+        </DialogHeader>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
+            <Label for="f-email">{{ t('admin.email') }}</Label>
+            <Input id="f-email" v-model="form.email" type="email" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <Label for="f-first">{{ t('admin.firstName') }}</Label>
+            <Input id="f-first" v-model="form.firstName" type="text" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <Label for="f-last">{{ t('admin.lastName') }}</Label>
+            <Input id="f-last" v-model="form.lastName" type="text" />
+          </div>
+          <div v-if="!editingId" class="flex flex-col gap-2">
+            <Label for="f-pw">{{ t('admin.password') }}</Label>
+            <Input id="f-pw" v-model="form.password" type="password" />
+          </div>
+          <div v-if="editingId" class="flex flex-col gap-2">
+            <Label for="f-role">{{ t('admin.role') }}</Label>
+            <NativeSelect id="f-role" v-model="form.role" class="w-full">
+              <option value="user">{{ t('admin.roleUser') }}</option>
+              <option value="admin">{{ t('admin.roleAdmin') }}</option>
+            </NativeSelect>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" @click="editDialogVisible = false">{{ t('admin.cancel') }}</Button>
+          <Button :disabled="saving" @click="saveUser">{{ t('admin.save') }}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
-    <UiModal :open="passwordDialogVisible" @close="passwordDialogVisible = false">
-      <template #header>{{ t('admin.setPassword') }}</template>
-      <div class="form-field">
-        <label for="f-newpw">{{ t('admin.newPassword') }}</label>
-        <input id="f-newpw" v-model="newPassword" type="password" />
-      </div>
-      <template #footer>
-        <button class="btn" type="button" @click="passwordDialogVisible = false">{{ t('admin.cancel') }}</button>
-        <button class="btn btn-primary" type="button" :disabled="saving" @click="savePassword">{{ t('admin.save') }}</button>
-      </template>
-    </UiModal>
+    <Dialog v-model:open="passwordDialogVisible">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{{ t('admin.setPassword') }}</DialogTitle>
+        </DialogHeader>
+        <div class="flex flex-col gap-2">
+          <Label for="f-newpw">{{ t('admin.newPassword') }}</Label>
+          <Input id="f-newpw" v-model="newPassword" type="password" />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" @click="passwordDialogVisible = false">{{ t('admin.cancel') }}</Button>
+          <Button :disabled="saving" @click="savePassword">{{ t('admin.save') }}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
 
@@ -281,35 +290,3 @@ async function impersonate(data: AdminUser) {
 
 onMounted(loadUsers)
 </script>
-
-<style scoped>
-.page-header {
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-.table-card {
-  padding: 0;
-  overflow-x: auto;
-}
-.table-card table {
-  min-width: 640px;
-}
-.row-actions {
-  display: flex;
-  gap: 0.25rem;
-}
-.badge {
-  display: inline-block;
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #fff;
-}
-.badge-success {
-  background: var(--color-success);
-}
-.badge-danger {
-  background: var(--color-danger);
-}
-</style>

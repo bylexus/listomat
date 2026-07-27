@@ -6,7 +6,8 @@
     "lists": "Lists",
     "templates": "Templates",
     "admin": "Administration",
-    "logout": "Logout"
+    "logout": "Logout",
+    "language": "Language"
   },
   "auth": {
     "email": "Email",
@@ -110,5 +111,8 @@
     "statusCurrent": "Current status",
     "statusEmpty": "Empty (to check off)",
     "exportAction": "Download"
+  },
+  "toast": {
+    "dismiss": "Dismiss"
   }
 }

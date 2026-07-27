@@ -1,27 +1,48 @@
 <template>
-  <div class="app-shell">
-    <UiToasts />
-    <UiConfirm />
-    <div v-if="session?.impersonatedBy" class="impersonation-banner">
+  <div class="flex min-h-screen flex-col">
+    <AppToaster />
+
+    <div
+      v-if="session?.impersonatedBy"
+      class="flex flex-wrap items-center justify-center gap-4 bg-amber-100 px-4 py-2 text-sm text-amber-900"
+    >
       <span>{{ t('admin.impersonating', { name: `${user?.firstName} ${user?.lastName}` }) }}</span>
-      <button class="btn" type="button" @click="stopImpersonation">{{ t('admin.backToAdmin') }}</button>
+      <Button variant="outline" size="sm" @click="stopImpersonation">
+        {{ t('admin.backToAdmin') }}
+      </Button>
     </div>
-    <header class="app-header">
-      <span class="app-title">{{ t('app.title') }}</span>
-      <nav v-if="loggedIn" class="app-nav">
-        <NuxtLink to="/">{{ t('nav.lists') }}</NuxtLink>
-        <NuxtLink to="/templates">{{ t('nav.templates') }}</NuxtLink>
-        <NuxtLink v-if="user?.role === 'admin'" to="/admin/users">{{ t('nav.admin') }}</NuxtLink>
+
+    <header class="flex flex-wrap items-center gap-4 border-b bg-card px-4 py-3">
+      <span class="text-lg font-bold">{{ t('app.title') }}</span>
+
+      <nav v-if="loggedIn" class="flex flex-1 gap-4 text-sm">
+        <NuxtLink to="/" class="text-primary underline-offset-4 hover:underline">
+          {{ t('nav.lists') }}
+        </NuxtLink>
+        <NuxtLink to="/templates" class="text-primary underline-offset-4 hover:underline">
+          {{ t('nav.templates') }}
+        </NuxtLink>
+        <NuxtLink
+          v-if="user?.role === 'admin'"
+          to="/admin/users"
+          class="text-primary underline-offset-4 hover:underline"
+        >
+          {{ t('nav.admin') }}
+        </NuxtLink>
       </nav>
-      <div v-else class="app-nav" />
-      <div class="app-lang">
-        <select v-model="locale" :aria-label="t('app.title')">
+      <div v-else class="flex-1" />
+
+      <div class="flex items-center gap-2">
+        <NativeSelect v-model="locale" :aria-label="t('nav.language')">
           <option v-for="l in availableLocales" :key="l.code" :value="l.code">{{ l.name }}</option>
-        </select>
-        <button v-if="loggedIn" class="btn btn-ghost" type="button" @click="logout">{{ t('nav.logout') }}</button>
+        </NativeSelect>
+        <Button v-if="loggedIn" variant="ghost" size="sm" @click="logout">
+          {{ t('nav.logout') }}
+        </Button>
       </div>
     </header>
-    <main class="app-main">
+
+    <main class="p-4">
       <slot />
     </main>
   </div>
@@ -44,50 +65,3 @@ async function stopImpersonation() {
   await navigateTo('/admin/users')
 }
 </script>
-
-<style scoped>
-.app-shell {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-.app-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
-  flex-wrap: wrap;
-}
-.app-title {
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-.app-nav {
-  display: flex;
-  gap: 1rem;
-  flex: 1;
-}
-.app-lang {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.app-lang select {
-  width: auto;
-}
-.app-main {
-  padding: 1rem;
-}
-.impersonation-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 0.5rem 1rem;
-  background: #fef3c7;
-  color: #92400e;
-  font-size: 0.9rem;
-}
-</style>

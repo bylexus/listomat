@@ -3,7 +3,7 @@
 Arbeitsdokument für den Branch `shadcn-ui`. Hält Abklärungen, Erkenntnisse, offene Fragen
 und (später) die getroffenen Entscheide fest.
 
-Status: **Abklärung – Entscheide E-S1 bis E-S15 gefällt, offen: F16 (Bezugsweg der Komponenten). Noch kein Code geändert.**
+Status: **Umgesetzt.** Entscheide E-S1 bis E-S16, keine offenen Fragen. Migration in einem Commit erfolgt (siehe Abschnitt 8).
 Blockiert durch: Netzwerk-Freigabe für `shadcn-vue.com` (siehe E-S3).
 
 ---
@@ -191,7 +191,7 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 | ~~F13~~ | *geklärt → E-S9* |
 | ~~F14~~ | *geklärt → E-S11* (Toast-Seite hängt an F15) |
 | ~~F15~~ | *geklärt → E-S15.* Ursprünglicher Widerspruch: E-S11 verlangt, `useToast.ts` zu löschen und pro Aufrufstelle auszubauen. E-S12 verlangt einen selbstgebauten Tailwind-Toast. Ein selbstgebauter Toast braucht aber genau das, was E-S11 streicht: einen gemeinsamen State und eine global gerenderte Overlay-Komponente. Bei 11 Aufrufstellen in 5 Seiten wäre eine Inline-Lösung 11-fach dupliziert. Auflösung nötig. |
-| F16 | **Vorschlag zur Revision von E-S3.** Die Registry-Domain bleibt gesperrt, aber `github.com` ist freigegeben – und das Quellrepo `unovue/shadcn-vue` enthält alles, was das CLI holen würde (siehe Abschnitt 3a). Soll ich die Komponenten von dort übernehmen statt auf die Domain-Freigabe zu warten? |
+| ~~F16~~ | *geklärt → E-S16.* Ursprünglicher Vorschlag: Die Registry-Domain bleibt gesperrt, aber `github.com` ist freigegeben – und das Quellrepo `unovue/shadcn-vue` enthält alles, was das CLI holen würde (siehe Abschnitt 3a). Soll ich die Komponenten von dort übernehmen statt auf die Domain-Freigabe zu warten? |
 
 ## 6. Entscheide
 
@@ -211,6 +211,7 @@ Gezählt über `app/pages/`, `app/layouts/`, `app/components/ui/` (1'778 Zeilen 
 | E-S12 | **Kein shadcn-Toast, kein `vue-sonner`.** Das Toast-Rendering wird selbst mit Tailwind gebaut. | 2026-07-27 |
 | E-S13 | `admin/users.vue` erhält die einfache, rein visuelle `Table`-Komponente. Kein `DataTable`, kein TanStack Table. | 2026-07-27 |
 | E-S14 | Der Branch `shadcn-ui` ist ein **Experiment mit offenem Ausgang**. Ein Merge nach `main` ist nicht zugesichert; `main` und `CLAUDE.md` bleiben unangetastet. | 2026-07-27 |
+| E-S16 | **Revision von E-S3.** Die Komponenten werden nicht per CLI, sondern direkt aus dem Quellrepo `unovue/shadcn-vue` übernommen (Klonstand siehe Abschnitt 8). `components.json` wird von Hand geschrieben, damit ein späteres `shadcn-vue add` lokal weiterhin funktioniert. | 2026-07-27 |
 | E-S15 | Auflösung von F15: Für Toasts bleiben **ein Composable und eine global gerenderte Komponente** bestehen; nur das Rendering wird auf Tailwind umgestellt. E-S11 gilt damit **nur für `useConfirm`** – dieses wird gelöscht und die 4 Aufrufstellen als `AlertDialog` ausgebaut. | 2026-07-27 |
 
 ### Konsequenz aus E-S2
@@ -234,3 +235,88 @@ fünf Seiten und beide Layouts.
 | 2026-07-27 | Entscheide E-S10 (kein Dark Mode), E-S11 (Composables löschen) festgehalten. F8 muss neu entschieden werden: shadcn-`Toast` ist deprecated. |
 | 2026-07-27 | Entscheide E-S12 (eigener Tailwind-Toast), E-S13 (einfache Table), E-S14 (Experiment) festgehalten. Widerspruch E-S11 ↔ E-S12 als F15 erfasst. |
 | 2026-07-27 | E-S15 löst F15. Alternativer Bezugsweg über GitHub verifiziert (Abschnitt 3a), als F16 zur Entscheidung gestellt. Dependency-Bedarf präzisiert. |
+| 2026-07-27 | E-S16 gefällt. Migration umgesetzt und gebaut (Abschnitt 8). |
+
+---
+
+## 8. Umsetzung
+
+Migration gemäss E-S6 in einem Commit. Quellstand der übernommenen Komponenten:
+`unovue/shadcn-vue`, Commit `feb41b5c3fea0eecc6857896c870eff4480641c8` (2026-07-25).
+
+### Neue Dependencies
+
+Laufzeit: `reka-ui`, `@vueuse/core`, `class-variance-authority`, `clsx`, `tailwind-merge`.
+Build: `tailwindcss`, `@tailwindcss/vite`, `tw-animate-css`, `shadcn-nuxt`.
+
+Nicht aufgenommen: `@lucide/vue` (E-S8), `vue-sonner` (E-S12), `@tanstack/vue-table` (E-S13).
+
+### Neue Dateien
+
+- `app/assets/css/tailwind.css` – Tailwind-Import, Slate-Tokens (nur Light), Basis-Layer
+- `app/lib/utils.ts` – `cn()`
+- `app/components/shadcn/` – 16 Komponenten: `alert-dialog`, `badge`, `button`, `card`,
+  `checkbox`, `dialog`, `empty`, `field`, `input`, `label`, `native-select`, `progress`,
+  `select`, `separator`, `table`, `textarea`
+- `app/components/AppToaster.vue` – Toast-Darstellung mit Tailwind (E-S12/E-S15)
+- `app/components/ListProgress.vue` – Ersatz für `UiProgress`, nutzt shadcn `Progress`
+- `components.json`
+
+### Entfernte Dateien
+
+`app/assets/css/main.css`, `app/components/ui/UiModal.vue`, `UiConfirm.vue`, `UiToasts.vue`,
+`UiProgress.vue`, `app/composables/useConfirm.ts`.
+`app/composables/useToast.ts` bleibt unverändert bestehen (E-S15).
+
+### Anpassungen an den Registry-Quellen
+
+1. Importpfade `@/registry/new-york-v4/ui/…` → `@/components/shadcn/…`.
+2. `table/utils.ts` gelöscht – einzige Stelle mit `@tanstack/vue-table` (E-S13).
+3. Alle `@lucide/vue`-Icons durch Inline-SVGs mit denselben Pfaddaten ersetzt (E-S8):
+   `DialogContent`, `DialogScrollContent`, `SelectTrigger`, `SelectItem`,
+   `SelectScrollUpButton`, `SelectScrollDownButton`, `NativeSelect`, `Checkbox`.
+
+### Ersetzungen im UI
+
+| Vorher | Nachher |
+|---|---|
+| `.btn` / `.btn-primary` / `.btn-danger` / `.btn-ghost` | `Button` (`default`, `outline`, `ghost`) |
+| `<input>` / `<select>` nativ | `Input` / `NativeSelect` |
+| `.form-field` + `<label>` | `flex flex-col gap-2` + `Label` |
+| `.card` | `Card` (+ `CardHeader`/`CardTitle`/`CardContent` im Login) |
+| `UiModal` | `Dialog` (Admin 2×, Listen-Detail 3×) |
+| `useConfirm()` | `AlertDialog` mit lokalem State (Übersicht 1×, Vorlagen 1×, Detail 2×) |
+| `UiProgress` | `ListProgress` auf Basis von `Progress` |
+| `<table>` in `admin/users.vue` | `Table` / `TableHeader` / `TableRow` / `TableHead` / `TableBody` / `TableCell` |
+| `.badge` | `Badge` |
+| `<input type="checkbox">` im Listen-Detail | `Checkbox` |
+| Alle scoped `<style>`-Blöcke | Tailwind-Utilities |
+
+Neue i18n-Schlüssel: `nav.language`, `toast.dismiss` (de + en).
+
+Beibehalten: `vue-draggable-plus` mit den Handle-Klassen `group-drag-handle` /
+`entry-drag-handle`, die `contenteditable`-Titel und das Inline-Edit-Muster (Speichern bei `blur`).
+
+### Geprüft
+
+- `npm run build` läuft ohne Fehler und ohne Auflösungswarnungen durch.
+- Kein `resolveComponent(...)` in Client- oder Server-Chunks – alle Komponenten werden
+  statisch aufgelöst, es fehlt also kein Auto-Import.
+- Erzeugtes CSS enthält die Slate-Tokens in `oklch`, die Tailwind-Layer und `animate-in`;
+  keine Reste der alten Custom Properties.
+- Dev-Server: Login, `/api/lists`, `/`, `/templates`, `/admin/users` und der PDF-Export
+  antworten mit 200; die serverseitig gerenderten Seiten enthalten shadcn-Markup.
+
+### Nicht geprüft
+
+Kein Browser verfügbar, daher ungetestet: das tatsächliche Öffnen und Schliessen der
+Dialoge, Drag & Drop, das Umschalten der Checkboxen sowie die Darstellung insgesamt.
+Diese Punkte brauchen einen manuellen Durchgang.
+
+## 9. Nach einem allfälligen Merge zu erledigen
+
+- `CLAUDE.md`: Regel «Kein UI-Framework, kein CSS-Framework, keine Icon-Library» ersetzen
+  und die neuen Konventionen (Tailwind-Utilities statt scoped CSS, `app/components/shadcn/`)
+  aufnehmen.
+- `docs/Entscheide.md`: E-S1 bis E-S16 übernehmen.
+- `docs/Umsetzung.md`: Abschnitt «UI-Basis» auf shadcn-vue umstellen.

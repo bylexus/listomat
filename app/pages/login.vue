@@ -1,20 +1,30 @@
 <template>
-  <div class="card login-card">
-    <h1>{{ t('app.title') }}</h1>
-    <form class="login-form" @submit.prevent="onSubmit">
-      <div class="form-field">
-        <label for="email">{{ t('auth.email') }}</label>
-        <input id="email" v-model="email" type="email" autocomplete="username" required />
-      </div>
-      <div class="form-field">
-        <label for="password">{{ t('auth.password') }}</label>
-        <input id="password" v-model="password" type="password" autocomplete="current-password" required />
-      </div>
-      <button class="btn btn-primary submit-btn" type="submit" :disabled="loading">
-        {{ t('auth.login') }}
-      </button>
-    </form>
-  </div>
+  <Card class="w-full max-w-sm">
+    <CardHeader>
+      <CardTitle class="text-xl">{{ t('app.title') }}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
+        <div class="flex flex-col gap-2">
+          <Label for="email">{{ t('auth.email') }}</Label>
+          <Input id="email" v-model="email" type="email" autocomplete="username" required />
+        </div>
+        <div class="flex flex-col gap-2">
+          <Label for="password">{{ t('auth.password') }}</Label>
+          <Input
+            id="password"
+            v-model="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+        <Button type="submit" class="mt-2" :disabled="loading">
+          {{ t('auth.login') }}
+        </Button>
+      </form>
+    </CardContent>
+  </Card>
 </template>
 
 <script setup lang="ts">
@@ -44,19 +54,3 @@ async function onSubmit() {
   }
 }
 </script>
-
-<style scoped>
-.login-card {
-  width: 100%;
-  max-width: 380px;
-}
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-.submit-btn {
-  margin-top: 0.5rem;
-}
-</style>
