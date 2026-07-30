@@ -15,7 +15,7 @@
       </nav>
       <div v-else class="app-nav" />
       <div class="app-lang">
-        <select v-model="locale" :aria-label="t('app.title')">
+        <select :value="locale" :aria-label="t('app.title')" @change="onLocaleChange">
           <option v-for="l in availableLocales" :key="l.code" :value="l.code">{{ l.name }}</option>
         </select>
         <button v-if="loggedIn" class="btn btn-ghost" type="button" @click="logout">{{ t('nav.logout') }}</button>
@@ -28,8 +28,14 @@
 </template>
 
 <script setup lang="ts">
-const { t, locale, locales } = useI18n()
+const { t, locale, locales, setLocale } = useI18n()
 const availableLocales = computed(() => locales.value)
+
+async function onLocaleChange(event: Event) {
+  const code = (event.target as HTMLSelectElement).value as 'de' | 'en'
+  await setLocale(code)
+  localStorage.setItem(LOCALE_STORAGE_KEY, code)
+}
 const { loggedIn, user, session, clear, fetch: refreshSession } = useUserSession()
 const { call } = useApi()
 
