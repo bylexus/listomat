@@ -139,6 +139,12 @@ Ergänzungen und Präzisierungen zu `Planung.md`. Bei Widerspruch gilt dieses Do
 - Export-Dialog: Radiobuttons für Format (PDF/Excel) und Status (aktuell/leer), Download via Klick auf unsichtbaren Link (Browser sendet Session-Cookie automatisch, kein Blob/fetch nötig). Sichtbar für Owner und Shared.
 - Dateiname: `Content-Disposition` mit ASCII-Fallback plus `filename*=UTF-8''…` für Umlaute/Sonderzeichen; verbotene Dateisystem-Zeichen werden ersetzt.
 
+## Testrunde E1–E10 (Juli 2026)
+
+- Sprachwahl: explizite Anwahl im Sprache-Menu wird im localStorage (`listomat.locale`) gespeichert und beim App-Start wiederhergestellt.
+- Neuer Eintrag (Vorlagen und Listen-Detail): wird auch beim Verlassen des Eingabefelds (Blur) gespeichert, nicht nur mit Enter.
+- «Als Vorlage speichern»: Name wird im Dialog abgefragt (Default: Gruppenname). Ist der Name unter den Vorlagen des Users bereits vergeben, wird serverseitig «Name (2)», «Name (3)», … verwendet.
+
 ## Offen
 
 - (wird laufend ergänzt)

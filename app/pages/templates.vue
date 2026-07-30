@@ -88,6 +88,7 @@
           class="entry-add-input"
           :placeholder="t('templates.addEntryPlaceholder')"
           @keydown.enter.prevent="addEntry(group)"
+          @blur="addEntry(group)"
         />
       </div>
     </VueDraggable>

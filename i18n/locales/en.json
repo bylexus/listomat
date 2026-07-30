@@ -85,6 +85,8 @@
     "empty": "No groups yet. Add a group.",
     "saveAsTemplate": "Save as template",
     "savedAsTemplate": "Group saved as template.",
+    "templateNameLabel": "Name",
+    "saveTemplateAction": "Save",
     "deleteGroup": "Delete group",
     "deleteGroupConfirm": "Delete group \"{name}\" including all entries?",
     "deleteEntry": "Delete entry",

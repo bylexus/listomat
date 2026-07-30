@@ -85,6 +85,8 @@
     "empty": "Noch keine Gruppen. Füge eine Gruppe hinzu.",
     "saveAsTemplate": "Als Vorlage speichern",
     "savedAsTemplate": "Gruppe als Vorlage gespeichert.",
+    "templateNameLabel": "Bezeichnung",
+    "saveTemplateAction": "Speichern",
     "deleteGroup": "Gruppe löschen",
     "deleteGroupConfirm": "Gruppe „{name}“ inkl. aller Einträge löschen?",
     "deleteEntry": "Eintrag löschen",

@@ -13,12 +13,14 @@ export async function copyGroup({
   sourceGroupId,
   targetListId,
   newOwnerId,
-  resetDone
+  resetDone,
+  newName
 }: {
   sourceGroupId: string
   targetListId: string | null
   newOwnerId: string
   resetDone: boolean
+  newName?: string
 }) {
   const source = await db.query.groups.findFirst({
     where: eq(groups.id, sourceGroupId),
@@ -41,7 +43,7 @@ export async function copyGroup({
   await db.transaction(async (tx) => {
     await tx.insert(groups).values({
       id: newGroupId,
-      name: source.name,
+      name: newName ?? source.name,
       ownerId: newOwnerId,
       listId: targetListId,
       origGroupId: source.id,

@@ -78,7 +78,7 @@
             class="btn btn-ghost"
             type="button"
             :title="t('listDetail.saveAsTemplate')"
-            @click="saveAsTemplate(group)"
+            @click="openSaveTemplateDialog(group)"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" stroke-linejoin="round" />
@@ -144,6 +144,7 @@
           class="entry-add-input"
           :placeholder="t('listDetail.addEntryPlaceholder')"
           @keydown.enter.prevent="addEntry(group)"
+          @blur="addEntry(group)"
         />
       </div>
     </VueDraggable>
@@ -196,6 +197,19 @@
             </button>
           </li>
         </ul>
+      </div>
+    </UiModal>
+
+    <UiModal :open="saveTemplateDialogOpen" @close="saveTemplateDialogOpen = false">
+      <template #header>{{ t('listDetail.saveAsTemplate') }}</template>
+      <div class="form-field">
+        <label>{{ t('listDetail.templateNameLabel') }}</label>
+        <div class="dialog-row">
+          <input v-model="saveTemplateName" type="text" @keydown.enter.prevent="saveAsTemplate" />
+          <button class="btn btn-primary" type="button" :disabled="!saveTemplateName.trim()" @click="saveAsTemplate">
+            {{ t('listDetail.saveTemplateAction') }}
+          </button>
+        </div>
       </div>
     </UiModal>
 
@@ -280,6 +294,10 @@ const selectedTemplateId = ref('')
 
 const shareDialogOpen = ref(false)
 const newShareEmail = ref('')
+
+const saveTemplateDialogOpen = ref(false)
+const saveTemplateName = ref('')
+const saveTemplateGroup = ref<ListGroup | null>(null)
 
 const exportDialogOpen = ref(false)
 const exportFormat = ref<'pdf' | 'xlsx'>('pdf')
@@ -388,12 +406,22 @@ async function confirmDeleteGroup(group: ListGroup) {
   }
 }
 
-async function saveAsTemplate(group: ListGroup) {
+function openSaveTemplateDialog(group: ListGroup) {
+  saveTemplateGroup.value = group
+  saveTemplateName.value = group.name
+  saveTemplateDialogOpen.value = true
+}
+
+async function saveAsTemplate() {
+  const group = saveTemplateGroup.value
+  const name = saveTemplateName.value.trim()
+  if (!group || !name) return
   const toast = useToast()
   const result = await call(() =>
-    $fetch(`/api/lists/${listId}/groups/${group.id}/save-as-template`, { method: 'POST' })
+    $fetch(`/api/lists/${listId}/groups/${group.id}/save-as-template`, { method: 'POST', body: { name } })
   )
   if (result) {
+    saveTemplateDialogOpen.value = false
     toast.add({ severity: 'success', summary: t('listDetail.savedAsTemplate'), life: 5000 })
   }
 }
