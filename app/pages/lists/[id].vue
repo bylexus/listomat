@@ -49,6 +49,8 @@
       </div>
     </div>
 
+    <UiProgress v-if="totalEntries > 0" class="list-progress" :done="totalDone" :total="totalEntries" />
+
     <p v-if="list.groups.length === 0" class="empty-state">{{ t('listDetail.empty') }}</p>
 
     <VueDraggable
@@ -323,6 +325,9 @@ function blurTarget(event: Event) {
 function doneCount(group: ListGroup) {
   return group.entries.filter((e) => e.done).length
 }
+
+const totalDone = computed(() => list.value?.groups.reduce((sum, g) => sum + doneCount(g), 0) ?? 0)
+const totalEntries = computed(() => list.value?.groups.reduce((sum, g) => sum + g.entries.length, 0) ?? 0)
 
 async function loadList() {
   const result = await call(() => $fetch<ListDetail>(`/api/lists/${listId}`))
@@ -654,6 +659,9 @@ onMounted(loadList)
 }
 .empty-state {
   color: var(--color-text-muted);
+}
+.list-progress {
+  margin-bottom: var(--space-3);
 }
 .groups-grid {
   display: grid;

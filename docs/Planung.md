@@ -144,7 +144,6 @@ Darstellung/Sortierung wie in der Oberfläche
 
 ## TODO
 
-- List-Progress auch in Detail-Ansicht anzeigen
 - Listenansicht: contenteditable nur wenn auf Schreiber geklickt - bei normalem Klick auf Listentitel soll diese aufgehen
 
 
