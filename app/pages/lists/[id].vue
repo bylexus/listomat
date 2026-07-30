@@ -144,7 +144,7 @@
                 @keydown.enter.prevent="blurTarget($event)"
               />
             </div>
-            <button class="btn btn-ghost" type="button" :title="t('listDetail.deleteEntry')" @click="deleteEntry(group, entry)">
+            <button class="btn btn-ghost entry-delete" type="button" :title="t('listDetail.deleteEntry')" @click="deleteEntry(group, entry)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -717,6 +717,7 @@ onMounted(loadList)
 }
 .entry-done {
   flex-shrink: 0;
+  align-self: flex-start;
 }
 .entry-texts {
   flex: 1;
@@ -745,7 +746,7 @@ onMounted(loadList)
 .entry-quantity {
   width: 2.5rem;
   flex-shrink: 0;
-  font-size: 0.8rem;
+  font-size: inherit;
   border: none;
   padding: 1px 4px;
   background: transparent;
@@ -761,6 +762,10 @@ onMounted(loadList)
 }
 .entry-quantity:focus {
   outline: 2px solid var(--color-primary);
+}
+.entry-delete,
+.entry-drag-handle {
+  align-self: flex-start;
 }
 .entry-comment {
   font-size: 0.8rem;

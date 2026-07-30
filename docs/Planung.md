@@ -144,6 +144,4 @@ Darstellung/Sortierung wie in der Oberfläche
 
 ## TODO
 
-- Listenansicht: contenteditable nur wenn auf Schreiber geklickt - bei normalem Klick auf Listentitel soll diese aufgehen
-
 

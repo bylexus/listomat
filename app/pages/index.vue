@@ -22,7 +22,7 @@
               <h3
                 :ref="(el) => setNameRef(list.id, el)"
                 class="list-name"
-                contenteditable="true"
+                :contenteditable="editingListId === list.id ? 'true' : 'false'"
                 spellcheck="false"
                 @blur="onRenameList(list, $event)"
                 @keydown.enter.prevent="blurTarget($event)"
@@ -92,13 +92,16 @@ const own = ref<ListSummary[]>([])
 const shared = ref<ListSummary[]>([])
 const loading = ref(false)
 const nameRefs = new Map<string, HTMLElement>()
+const editingListId = ref<string | null>(null)
 
 function setNameRef(id: string, el: any) {
   if (el) nameRefs.set(id, el as HTMLElement)
   else nameRefs.delete(id)
 }
 
-function focusName(id: string) {
+async function focusName(id: string) {
+  editingListId.value = id
+  await nextTick()
   const el = nameRefs.get(id)
   if (!el) return
   el.focus()
@@ -137,8 +140,8 @@ async function addList() {
 }
 
 function openList(list: ListSummary, event: MouseEvent) {
-  // Klicks auf Buttons oder den editierbaren Namen navigieren nicht
-  if ((event.target as HTMLElement).closest('button, [contenteditable]')) return
+  // Klicks auf Buttons oder den aktiv editierbaren Namen navigieren nicht
+  if ((event.target as HTMLElement).closest('button, [contenteditable="true"]')) return
   navigateTo(`/lists/${list.id}`)
 }
 
@@ -156,6 +159,7 @@ async function duplicateList(list: ListSummary) {
 }
 
 async function onRenameList(list: ListSummary, event: FocusEvent) {
+  editingListId.value = null
   const el = event.target as HTMLElement
   const value = el.innerText.trim()
   if (!value) {
