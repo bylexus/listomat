@@ -141,6 +141,10 @@ textarea {
   width: 100%;
 }
 
+input[type='checkbox'] {
+  width: auto;
+}
+
 input:focus,
 select:focus,
 textarea:focus {

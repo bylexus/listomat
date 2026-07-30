@@ -141,4 +141,10 @@ Eine Liste soll als PDF und Excel exportiert werden können.
 
 Darstellung/Sortierung wie in der Oberfläche
 
+## TODO
+
+- Einträge mit optionaler Anzahl (z.B. Socken, Anzahl 5)
+- List-Progress auch in Detail-Ansicht anzeigen
+- Listenansicht: contenteditable nur wenn auf Schreiber geklickt - bei normalem Klick auf Listentitel soll diese aufgehen
+
 
