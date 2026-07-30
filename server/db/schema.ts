@@ -52,6 +52,7 @@ export const entries = sqliteTable('entries', {
   sortOrder: integer('sort_order').notNull().default(0),
   done: integer('done', { mode: 'boolean' }).notNull().default(false),
     // bei Vorlagen-Gruppen ungenutzt, bleibt false
+  quantity: integer('quantity'), // nullable; null = no quantity, 0 is valid
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
 })

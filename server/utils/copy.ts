@@ -6,7 +6,7 @@ import { entries, groups } from '../db/schema'
 // Zentrale Kopierlogik (3 Verwendungen: Vorlage→Liste, Liste→Vorlage, Liste duplizieren):
 // - neue uuidv7 für Gruppe und alle Einträge
 // - origGroupId = Quell-Gruppen-Id
-// - Kommentare immer mitkopieren
+// - Kommentare und quantity immer mitkopieren
 // - done: bei resetDone false, sonst übernehmen
 // - sortOrder der Einträge übernehmen; Gruppe ans Ende der Zielmenge
 export async function copyGroup({
@@ -54,6 +54,7 @@ export async function copyGroup({
         id: uuidv7(),
         name: entry.name,
         comment: entry.comment,
+        quantity: entry.quantity,
         groupId: newGroupId,
         creatorId: newOwnerId,
         sortOrder: entry.sortOrder,

@@ -91,6 +91,7 @@ Die einzelnen Einträge einer Gruppe.
 - gruppe-id, fk
 - reihenfolge: nr, Sortierreihenfolge
 - erledigt, bool: nur benötigt, wenn zu einer Listen-Gruppe gehört: bei einer Vorlagen-Gruppe wird das Flag nicht benötigt
+- anzahl: int, optional (z.B. Socken, Anzahl 5); gilt für Vorlagen- und Listen-Einträge
 
 ### Ui-Module
 
@@ -143,7 +144,6 @@ Darstellung/Sortierung wie in der Oberfläche
 
 ## TODO
 
-- Einträge mit optionaler Anzahl (z.B. Socken, Anzahl 5)
 - List-Progress auch in Detail-Ansicht anzeigen
 - Listenansicht: contenteditable nur wenn auf Schreiber geklickt - bei normalem Klick auf Listentitel soll diese aufgehen
 

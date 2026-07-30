@@ -30,3 +30,12 @@ export function requireBool(body: any, field: string): boolean {
   }
   return value
 }
+
+export function optionalInt(body: any, field: string, { min = 0, max = 999999 }: { min?: number; max?: number } = {}): number | null {
+  const value = body?.[field]
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < min || value > max) {
+    throw createError({ statusCode: 400, statusMessage: `${field} is invalid` })
+  }
+  return value
+}

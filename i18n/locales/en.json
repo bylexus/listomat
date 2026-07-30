@@ -58,6 +58,7 @@
     "deleteEntry": "Delete entry",
     "addEntryPlaceholder": "+ Add entry",
     "commentPlaceholder": "Comment",
+    "quantityLabel": "Quantity",
     "dragGroup": "Move group",
     "dragEntry": "Move entry"
   },
@@ -92,6 +93,7 @@
     "deleteEntry": "Delete entry",
     "addEntryPlaceholder": "+ Add entry",
     "commentPlaceholder": "Comment",
+    "quantityLabel": "Quantity",
     "dragGroup": "Move group",
     "dragEntry": "Move entry",
     "reset": "Reset",

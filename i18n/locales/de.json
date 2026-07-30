@@ -58,6 +58,7 @@
     "deleteEntry": "Eintrag löschen",
     "addEntryPlaceholder": "+ Eintrag hinzufügen",
     "commentPlaceholder": "Kommentar",
+    "quantityLabel": "Anzahl",
     "dragGroup": "Gruppe verschieben",
     "dragEntry": "Eintrag verschieben"
   },
@@ -92,6 +93,7 @@
     "deleteEntry": "Eintrag löschen",
     "addEntryPlaceholder": "+ Eintrag hinzufügen",
     "commentPlaceholder": "Kommentar",
+    "quantityLabel": "Anzahl",
     "dragGroup": "Gruppe verschieben",
     "dragEntry": "Eintrag verschieben",
     "reset": "Zurücksetzen",

@@ -145,6 +145,18 @@ Ergänzungen und Präzisierungen zu `Planung.md`. Bei Widerspruch gilt dieses Do
 - Neuer Eintrag (Vorlagen und Listen-Detail): wird auch beim Verlassen des Eingabefelds (Blur) gespeichert, nicht nur mit Enter.
 - «Als Vorlage speichern»: Name wird im Dialog abgefragt (Default: Gruppenname). Ist der Name unter den Vorlagen des Users bereits vergeben, wird serverseitig «Name (2)», «Name (3)», … verwendet.
 
+## E10 – Eintrags-Anzahl (Juli 2026)
+
+- **Schema**: Eintrag erhält Feld `quantity` (integer, nullable). Gilt für Vorlagen- und Listen-Einträge.
+- **Wertebereich**: nullable, min. 0. Leer = keine Anzahl (null); 0 ist ein gültiger Wert und wird angezeigt. Ganze Zahlen, keine Obergrenze ausser Validierungslimit (max. 999999).
+- **UI**: schmales Nummern-Feld (`<input type="number">`) zwischen Eintragsname und Kommentar-Feld, immer sichtbar, implizites Speichern bei blur/change (analog Kommentar). Gilt für Listen-Detail und Vorlagen-Seite.
+- **UI-Präzisierung Listen-Detail (nach erstem Test)**: Eintragsname und Anzahl nebeneinander in einer Zeile (Name nimmt die Restbreite), Kommentar darunter. Anzahl-Feld ca. 2 Ziffern breit, rechtsbündig, Placeholder «0», Browser-Spinbuttons ausgeblendet.
+- **Neuanlage**: das «Neuer Eintrag»-Feld am Gruppenende erhält kein Anzahl-Feld; neue Einträge werden ohne Anzahl angelegt, die Anzahl wird danach am Eintrag gesetzt.
+- **Kopierlogik**: `quantity` wird bei allen Kopiervorgängen mitkopiert (Vorlage→Liste, Liste→Vorlage, Duplizieren) – analog Kommentar.
+- **Export PDF**: Anzahl als Präfix vor dem Eintragsnamen («5× Socken»); ohne Anzahl nur der Name.
+- **Export Excel**: eigene Spalte «Anzahl» zwischen «Erledigt» und «Bezeichnung» (neu 4 Spalten: Erledigt, Anzahl, Bezeichnung, Kommentar).
+- **Etappen**: Umsetzung als E10 vor Docker eingeschoben; Docker wird E11.
+
 ## Offen
 
 - (wird laufend ergänzt)

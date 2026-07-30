@@ -3,7 +3,7 @@ import { db } from '../../../../db'
 import { entries } from '../../../../db/schema'
 import { requireUser } from '../../../../utils/auth'
 import { requireOwnedTemplate } from '../../../../utils/access'
-import { requireString, optionalString } from '../../../../utils/validate'
+import { requireString, optionalString, optionalInt } from '../../../../utils/validate'
 
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event)
@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
   const update: Record<string, unknown> = { updatedAt: new Date() }
   if (body?.name !== undefined) update.name = requireString(body, 'name', { max: 500 })
   if (body?.comment !== undefined) update.comment = optionalString(body, 'comment', { max: 2000 })
+  if (body?.quantity !== undefined) update.quantity = optionalInt(body, 'quantity')
 
   await db.update(entries).set(update).where(eq(entries.id, entryId))
 

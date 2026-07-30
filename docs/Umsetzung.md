@@ -115,6 +115,7 @@ export const entries = sqliteTable('entries', {
   sortOrder: integer('sort_order').notNull().default(0),
   done: integer('done', { mode: 'boolean' }).notNull().default(false),
     // bei Vorlagen-Gruppen ungenutzt, bleibt false
+  quantity: integer('quantity'),  // nullable; null = keine Anzahl, 0 ist gültig
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
 })
@@ -160,6 +161,8 @@ async function requireListOwner(event, listId): Promise<{ user, list }>  // sons
 function requireString(body, field, { max = 500 } = {}): string  // trim, 400 bei leer/fehlend/zu lang
 function optionalString(body, field, { max = 2000 } = {}): string | null
 function requireBool(body, field): boolean
+function optionalInt(body, field, { min = 0, max = 999999 } = {}): number | null
+  // undefined/null/'' => null; sonst ganze Zahl im Bereich, 400 bei ungültig
 ```
 
 Jede API-Route beginnt mit dem passenden `require*`-Aufruf. Vorlagen-Gruppen (listId null) sind strikt privat: Zugriff nur wenn `ownerId === user.id`.
@@ -194,7 +197,7 @@ Keine Passwortregeln. Admin kann sich nicht selbst deaktivieren (400).
 | PATCH /api/templates/:id | { name?, sortOrder-Handling siehe Sortierung } | Group |
 | DELETE /api/templates/:id | – | { ok: true } |
 | POST /api/templates/:id/entries | { name, comment? } | Entry |
-| PATCH /api/templates/:id/entries/:entryId | { name?, comment? } | Entry |
+| PATCH /api/templates/:id/entries/:entryId | { name?, comment?, quantity? } | Entry; quantity: int >= 0 oder null (löscht die Anzahl) |
 | DELETE /api/templates/:id/entries/:entryId | – | { ok: true } |
 | PUT /api/templates/order | { ids: string[] } | { ok: true } (Neunummerierung) |
 | PUT /api/templates/:id/entries/order | { ids: string[] } | { ok: true } |
@@ -225,7 +228,7 @@ Keine Passwortregeln. Admin kann sich nicht selbst deaktivieren (400).
 | POST /api/lists/:id/groups/:groupId/save-as-template | – | kopiert Gruppe+Einträge als Vorlage des Aufrufers (done ignoriert, Kommentare mit, origGroupId gesetzt) | Group |
 | POST /api/lists/:id/groups/from-template | { templateId } | Vorlage muss dem Aufrufer gehören; kopiert Gruppe+Einträge in die Liste ans Ende, origGroupId gesetzt | Group inkl. entries[] |
 | POST /api/lists/:id/groups/:groupId/entries | { name, comment? } | Entry |
-| PATCH /api/lists/:id/groups/:groupId/entries/:entryId | { name?, comment?, done? } | Entry |
+| PATCH /api/lists/:id/groups/:groupId/entries/:entryId | { name?, comment?, done?, quantity? } | Entry; quantity: int >= 0 oder null (löscht die Anzahl) |
 | DELETE /api/lists/:id/groups/:groupId/entries/:entryId | – | { ok: true } |
 | PUT /api/lists/:id/groups/order | { ids: string[] } | { ok: true } |
 | PUT /api/lists/:id/groups/:groupId/entries/order | { ids: string[], movedEntryId?: string } | { ok: true }; wenn movedEntryId aus anderer Gruppe derselben Liste stammt, wird er in diese Gruppe verschoben (groupId umsetzen) und einsortiert |
@@ -247,7 +250,7 @@ Jede mutierende Listen-Operation aktualisiert `lists.updatedAt`.
 Eine Funktion `copyGroup({ sourceGroupId, targetListId | null, newOwnerId, resetDone })`:
 - neue uuidv7 für Gruppe und alle Einträge
 - `origGroupId` = Quell-Gruppen-Id
-- Kommentare immer mitkopieren
+- Kommentare und `quantity` immer mitkopieren
 - `done`: bei `resetDone` false, sonst übernehmen (aktuell überall resetDone = true bzw. irrelevant)
 - `sortOrder` der Einträge übernehmen; Gruppe ans Ende der Zielmenge
 Verwendungen: Vorlage→Liste, Liste→Vorlage, Liste duplizieren (Schleife über Gruppen).
@@ -293,7 +296,7 @@ Kein UI-Framework. Verbindliche Bausteine:
 - Titel als contenteditable-H1 (nur Owner editierbar), Speichern bei blur.
 - Gruppen als Karten im Grid: mobile 1 Spalte, ab Tablet (min-width: 768px) 2 Spalten. CSS Grid, keine Zusatzlib.
 - Gruppen-Titel contenteditable; Karten-Aktionen: löschen (Bestätigungsdialog), als Vorlage speichern. Neue Gruppe via Plus-Button in der Toolbar: kleiner Dialog mit Bezeichnungs-Eingabe oder Vorlagen-Auswahl (Select) zum Einfügen.
-- Einträge: Checkbox (done) + Name (contenteditable) + Kommentar (kleiner, Input-Feld) + Löschen-Icon (ohne Bestätigung). Neue Einträge über Eingabefeld am Gruppenende (Enter = anlegen).
+- Einträge: Checkbox (done) + Name (contenteditable) + Anzahl (schmales `<input type="number">`, min 0, leer = keine Anzahl) + Kommentar (kleiner, Input-Feld) + Löschen-Icon (ohne Bestätigung). Anzahl speichert implizit bei blur/change (analog Kommentar). Neue Einträge über Eingabefeld am Gruppenende (Enter = anlegen); dort kein Anzahl-Feld, neue Einträge starten ohne Anzahl.
 - Fortschritt pro Gruppe im Karten-Header (z.B. "2/5").
 - Drag'n'drop: Gruppen untereinander sortieren; Einträge innerhalb Gruppe und zwischen Gruppen. Umsetzung mit `vue-draggable-plus` (SortableJS-basiert, Vue-3-kompatibel, Touch-Support). Keine weiteren DnD-Libs.
 - Toolbar: Reset-Haken (mit Bestätigung), Duplizieren, Export-Dialog (Format PDF/Excel + Status aktuell/leer), Teilen-Dialog (nur Owner: E-Mail-Feld, Liste der Freigaben mit Entfernen).
@@ -311,13 +314,13 @@ Kein UI-Framework. Verbindliche Bausteine:
 - A4 hochkant, Ränder 15 mm.
 - Kopf: Listenname als Titel, darunter klein Exportdatum.
 - Inhalt **zweispaltig**: Gruppen werden nacheinander in Spalten gesetzt (erst Spalte 1 füllen, dann Spalte 2, dann neue Seite). **Eine Gruppe wird nie umbrochen**: vor dem Zeichnen Gruppenhöhe berechnen (Titel + n Einträge × Zeilenhöhe, Kommentare eingerechnet); passt sie nicht mehr in die aktuelle Spalte, in die nächste Spalte/Seite springen. Gruppen, die länger als eine ganze Spalte sind: ausnahmsweise umbrechen (sonst unlösbar).
-- Gruppe: Gruppenname fett, darunter Einträge: Checkbox-Kästchen ▢ (bei status=current und done: ☑ oder gefülltes Kästchen), Eintragsname, Kommentar in kleinerer, kursiver Schrift dahinter oder darunter.
+- Gruppe: Gruppenname fett, darunter Einträge: Checkbox-Kästchen ▢ (bei status=current und done: ☑ oder gefülltes Kästchen), Eintragsname mit Anzahl als Präfix («5× Socken»; ohne Anzahl nur der Name), Kommentar in kleinerer, kursiver Schrift dahinter oder darunter.
 - Schrift: Standard-Helvetica von pdfkit, keine Font-Einbettung.
 
 ### Excel (exceljs)
 - Ein Sheet, Name = Listenname (gekürzt auf 31 Zeichen, verbotene Zeichen ersetzt).
 - Zeile 1: Listenname, fett, Grösse ~16.
-- Pro Gruppe: Leerzeile, dann Gruppenname fett mit Hintergrundfarbe; darunter Einträge in Spalten: A = Erledigt ("x" oder leer bei status=current; immer leer bei status=empty), B = Bezeichnung, C = Kommentar. Spaltenbreiten sinnvoll fix setzen.
+- Pro Gruppe: Leerzeile, dann Gruppenname fett mit Hintergrundfarbe; darunter Einträge in Spalten: A = Erledigt ("x" oder leer bei status=current; immer leer bei status=empty), B = Anzahl (Zahl oder leer), C = Bezeichnung, D = Kommentar. Spaltenbreiten sinnvoll fix setzen.
 
 ## Docker
 
@@ -334,7 +337,7 @@ Prüfpunkte: `npm run dev` läuft, Sprachumschaltung wirkt.
 
 **E2 – Schema, Migrationen, Seed** *(erledigt)*
 schema.ts wie oben, drizzle.config, erste Migration generieren + ausführen, Seed-Script.
-Prüfpunkte: `data/app.db` entsteht, Tabellen vorhanden, Admin-User in DB.
+Prüfpunkte: `data/listomat.db` entsteht, Tabellen vorhanden, Admin-User in DB.
 
 **E3 – Auth** *(erledigt)*
 Login/Logout/me-Routen, Session, Login-Seite, globale Middleware, requireUser/requireAdmin.
@@ -375,6 +378,10 @@ Prüfpunkte: mit 2 Usern testen; unbekannte E-Mail → Fehler; Freigabe entferne
 PDF- und Excel-Route, Export-Dialog.
 Prüfpunkte: beide Formate mit status=current und status=empty; PDF zweispaltig, Gruppen nicht umbrochen; Excel formatiert.
 
-**E10 – Docker**
+**E10 – Eintrags-Anzahl** *(vor Docker eingeschoben, siehe Entscheide «E10 – Eintrags-Anzahl»)*
+Schema-Feld `entries.quantity` (nullable int) + Migration; `optionalInt` in validate.ts; PATCH-Routen für Vorlagen- und Listen-Einträge um `quantity` erweitern; Kopierlogik kopiert `quantity` mit; Nummern-Feld im Eintrag (Listen-Detail und Vorlagen-Seite, zwischen Name und Kommentar); Export PDF (Präfix «5×») und Excel (Spalte «Anzahl»).
+Prüfpunkte: Anzahl setzen/ändern/löschen (leer) auf Vorlagen- und Listen-Einträgen, überlebt Reload; 0 wird angezeigt; Kopieren (Vorlage→Liste, Liste→Vorlage, Duplizieren) übernimmt die Anzahl; PDF und Excel zeigen die Anzahl gemäss Layout; bestehende Einträge (Migration) ohne Anzahl.
+
+**E11 – Docker** *(ehemals E10)*
 Dockerfile, Compose mit Migrations-Init-Container.
 Prüfpunkte: `docker compose up` auf leerem Volume → Migration + Seed laufen, App erreichbar, Daten überleben Neustart.

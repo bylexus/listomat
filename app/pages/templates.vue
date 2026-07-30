@@ -67,6 +67,16 @@
               @keydown.enter.prevent="blurTarget($event)"
             >{{ entry.name }}</span>
             <input
+              class="entry-quantity"
+              type="number"
+              min="0"
+              placeholder="0"
+              :title="t('templates.quantityLabel')"
+              :value="entry.quantity ?? ''"
+              @blur="onEntryQuantityBlur(group, entry, $event)"
+              @keydown.enter.prevent="blurTarget($event)"
+            />
+            <input
               class="entry-comment"
               type="text"
               :value="entry.comment ?? ''"
@@ -102,6 +112,7 @@ interface TemplateEntry {
   id: string
   name: string
   comment: string | null
+  quantity: number | null
   groupId: string
   creatorId: string
   sortOrder: number
@@ -223,6 +234,20 @@ async function onEntryCommentBlur(group: TemplateGroup, entry: TemplateEntry, ev
   }
 }
 
+async function onEntryQuantityBlur(group: TemplateGroup, entry: TemplateEntry, event: FocusEvent) {
+  const el = event.target as HTMLInputElement
+  const value = el.value === '' ? null : Number(el.value)
+  if (value === entry.quantity) return
+  const result = await call(() =>
+    $fetch<TemplateEntry>(`/api/templates/${group.id}/entries/${entry.id}`, { method: 'PATCH', body: { quantity: value } })
+  )
+  if (result) {
+    entry.quantity = result.quantity
+  } else {
+    el.value = entry.quantity === null ? '' : String(entry.quantity)
+  }
+}
+
 async function deleteEntry(group: TemplateGroup, entry: TemplateEntry) {
   const result = await call(() => $fetch(`/api/templates/${group.id}/entries/${entry.id}`, { method: 'DELETE' }))
   if (result) {
@@ -318,6 +343,14 @@ onMounted(loadTemplates)
 .entry-name:focus {
   outline: 2px solid var(--color-primary);
   outline-offset: -1px;
+}
+
+.entry-quantity {
+  flex: 0 0 4rem;
+  width: 4rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
 }
 
 .entry-comment {

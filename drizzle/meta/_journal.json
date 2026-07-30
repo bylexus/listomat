@@ -8,6 +8,13 @@
       "when": 1784659039290,
       "tag": "0000_aspiring_paper_doll",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1785419743651,
+      "tag": "0001_large_gargoyle",
+      "breakpoints": true
     }
   ]
 }

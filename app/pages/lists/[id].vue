@@ -113,14 +113,26 @@
               @change="onToggleDone(group, entry, $event)"
             />
             <div class="entry-texts">
-              <span
-                class="entry-name"
-                :class="{ done: entry.done }"
-                contenteditable="true"
-                spellcheck="false"
-                @blur="onEntryNameBlur(group, entry, $event)"
-                @keydown.enter.prevent="blurTarget($event)"
-              >{{ entry.name }}</span>
+              <div class="entry-main">
+                <span
+                  class="entry-name"
+                  :class="{ done: entry.done }"
+                  contenteditable="true"
+                  spellcheck="false"
+                  @blur="onEntryNameBlur(group, entry, $event)"
+                  @keydown.enter.prevent="blurTarget($event)"
+                >{{ entry.name }}</span>
+                <input
+                  class="entry-quantity"
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  :title="t('listDetail.quantityLabel')"
+                  :value="entry.quantity ?? ''"
+                  @blur="onEntryQuantityBlur(group, entry, $event)"
+                  @keydown.enter.prevent="blurTarget($event)"
+                />
+              </div>
               <input
                 class="entry-comment"
                 type="text"
@@ -243,6 +255,7 @@ interface ListEntry {
   id: string
   name: string
   comment: string | null
+  quantity: number | null
   groupId: string
   creatorId: string
   sortOrder: number
@@ -501,6 +514,23 @@ async function onEntryCommentBlur(group: ListGroup, entry: ListEntry, event: Foc
   }
 }
 
+async function onEntryQuantityBlur(group: ListGroup, entry: ListEntry, event: FocusEvent) {
+  const el = event.target as HTMLInputElement
+  const value = el.value === '' ? null : Number(el.value)
+  if (value === entry.quantity) return
+  const result = await call(() =>
+    $fetch<ListEntry>(`/api/lists/${listId}/groups/${group.id}/entries/${entry.id}`, {
+      method: 'PATCH',
+      body: { quantity: value }
+    })
+  )
+  if (result) {
+    entry.quantity = result.quantity
+  } else {
+    el.value = entry.quantity === null ? '' : String(entry.quantity)
+  }
+}
+
 async function deleteEntry(group: ListGroup, entry: ListEntry) {
   const result = await call(() =>
     $fetch(`/api/lists/${listId}/groups/${group.id}/entries/${entry.id}`, { method: 'DELETE' })
@@ -686,7 +716,14 @@ onMounted(loadList)
   display: flex;
   flex-direction: column;
 }
+.entry-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
 .entry-name {
+  flex: 1;
+  min-width: 0;
   padding: 1px 4px;
   border-radius: var(--radius);
 }
@@ -695,6 +732,26 @@ onMounted(loadList)
   color: var(--color-text-muted);
 }
 .entry-name[contenteditable]:focus {
+  outline: 2px solid var(--color-primary);
+}
+.entry-quantity {
+  width: 2.5rem;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  border: none;
+  padding: 1px 4px;
+  background: transparent;
+  color: var(--color-text-muted);
+  text-align: right;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.entry-quantity::-webkit-inner-spin-button,
+.entry-quantity::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.entry-quantity:focus {
   outline: 2px solid var(--color-primary);
 }
 .entry-comment {

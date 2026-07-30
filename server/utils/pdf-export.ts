@@ -5,6 +5,7 @@ export interface ExportEntry {
   name: string
   comment: string | null
   done: boolean
+  quantity: number | null
 }
 
 export interface ExportGroup {
@@ -94,9 +95,13 @@ export async function buildListPdf(
       return doc.heightOfString(group.name, { width: columnWidth })
     }
 
+    function entryDisplayName(entry: ExportEntry) {
+      return entry.quantity !== null ? `${entry.quantity}× ${entry.name}` : entry.name
+    }
+
     function entryHeight(entry: ExportEntry) {
       doc.font('Helvetica').fontSize(ENTRY_NAME_FONT_SIZE)
-      const nameHeight = doc.heightOfString(entry.name, { width: entryTextWidth })
+      const nameHeight = doc.heightOfString(entryDisplayName(entry), { width: entryTextWidth })
       let height = Math.max(nameHeight, CHECKBOX_SIZE)
       if (entry.comment) {
         doc.font('Helvetica-Oblique').fontSize(ENTRY_COMMENT_FONT_SIZE)
@@ -138,9 +143,10 @@ export async function buildListPdf(
       }
 
       const textX = x + CHECKBOX_SIZE + CHECKBOX_GAP
+      const displayName = entryDisplayName(entry)
       doc.font('Helvetica').fontSize(ENTRY_NAME_FONT_SIZE).fillColor('#000000')
-      doc.text(entry.name, textX, y, { width: entryTextWidth })
-      const nameHeight = doc.heightOfString(entry.name, { width: entryTextWidth })
+      doc.text(displayName, textX, y, { width: entryTextWidth })
+      const nameHeight = doc.heightOfString(displayName, { width: entryTextWidth })
       const nameBlockHeight = Math.max(nameHeight, CHECKBOX_SIZE)
 
       if (entry.comment) {

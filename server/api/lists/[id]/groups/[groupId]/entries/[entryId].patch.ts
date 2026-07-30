@@ -3,7 +3,7 @@ import { db } from '../../../../../../db'
 import { entries } from '../../../../../../db/schema'
 import { requireGroupEntry, requireListAccess, requireListGroup } from '../../../../../../utils/access'
 import { touchList } from '../../../../../../utils/lists'
-import { requireString, optionalString, requireBool } from '../../../../../../utils/validate'
+import { requireString, optionalString, requireBool, optionalInt } from '../../../../../../utils/validate'
 
 export default defineEventHandler(async (event) => {
   const listId = getRouterParam(event, 'id')!
@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
   if (body?.name !== undefined) patch.name = requireString(body, 'name', { max: 500 })
   if (body?.comment !== undefined) patch.comment = optionalString(body, 'comment', { max: 2000 })
   if (body?.done !== undefined) patch.done = requireBool(body, 'done')
+  if (body?.quantity !== undefined) patch.quantity = optionalInt(body, 'quantity')
   if (Object.keys(patch).length === 0) {
     throw createError({ statusCode: 400, statusMessage: 'Nothing to update' })
   }
