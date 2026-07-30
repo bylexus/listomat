@@ -1,0 +1,16 @@
+# Claim bound explicitly to the local PV above via volumeName + storageClassName "".
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: listomat-data
+  namespace: listomat
+  labels:
+    app: listomat
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  volumeName: listomat-data
+  resources:
+    requests:
+      storage: 2Gi

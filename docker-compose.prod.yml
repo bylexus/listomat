@@ -1,0 +1,23 @@
+services:
+  migrate:
+    image: registry.alexi.ch/listomat:latest
+    command: ["node", "migrate.cjs"]
+    restart: "no"
+    volumes:
+      - listomat-data:/app/data
+
+  app:
+    image: registry.alexi.ch/listomat:latest
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:?NUXT_SESSION_PASSWORD muss gesetzt sein}
+    ports:
+      - '${APP_PORT:-3000}:3000'
+    volumes:
+      - listomat-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  listomat-data:

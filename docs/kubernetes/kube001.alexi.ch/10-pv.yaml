@@ -1,0 +1,33 @@
+# Manually provisioned local PersistentVolume (pattern mirrors the existing
+# "registry-data" PV). storageClassName "" disables dynamic provisioning by the
+# default microk8s-hostpath StorageClass. The host directory already exists on
+# node kube001 and must stay on that node (nodeAffinity), because a local volume
+# is not portable across nodes.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: listomat-data
+  labels:
+    app: listomat
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  volumeMode: Filesystem
+  # Pre-bind to the claim so nothing else can grab this PV.
+  claimRef:
+    name: listomat-data
+    namespace: listomat
+  local:
+    path: /data/microk8s-storage/listomat-data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - kube001

@@ -35,6 +35,6 @@ Vor jeder Arbeit an einer neuen Etappe: `docs/Umsetzung.md` zur betreffenden Eta
 
 ## Aktueller Stand (bei Etappenabschluss aktualisieren)
 
-- Erledigt: E1–E9, E3b (PrimeVue-Ausbau), globale API-Auth-Middleware
-- **Nächste Etappe: E10 – Eintrags-Anzahl (vor Docker eingeschoben)**
-- Danach: E11 – Docker (ehemals E10; wartet auf Freigabe durch manuellen Test im Dev-Container)
+- Erledigt: E1–E10, E3b (PrimeVue-Ausbau), globale API-Auth-Middleware
+- E11 – Docker: umgesetzt, Freigabe durch manuellen Test ausstehend
+- **Nächste Etappe: E12 – Kubernetes-Deployment (kube001.alexi.ch)** – Plan in `docs/Umsetzung.md` dokumentiert, wartet auf Freigabe; Manifests unter `docs/kubernetes/kube001.alexi.ch/` noch nicht erstellt

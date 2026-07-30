@@ -10,26 +10,27 @@
     "postinstall": "nuxt prepare",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "tsx server/db/seed.ts"
+    "db:seed": "tsx server/db/seed.ts",
+    "docker:build-push": "docker buildx build --no-cache --push --platform linux/amd64,linux/arm64 -f docker/Dockerfile -t registry.alexi.ch/listomat:latest ."
   },
   "dependencies": {
     "@libsql/client": "^0.17.4",
-    "@nuxtjs/i18n": "^10.5.0",
     "bcrypt": "^6.0.0",
     "drizzle-orm": "^0.45.2",
     "exceljs": "^4.4.0",
-    "nuxt": "^4.5.0",
     "nuxt-auth-utils": "^0.5.29",
     "pdfkit": "^0.19.1",
-    "uuidv7": "^1.2.1",
+    "uuidv7": "^1.2.1"
+  },
+  "devDependencies": {
+    "@nuxtjs/i18n": "^10.5.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/pdfkit": "^0.17.6",
+    "drizzle-kit": "^0.31.10",
+    "nuxt": "^4.5.0",
     "vue": "^3.5.40",
     "vue-draggable-plus": "^0.6.1",
     "vue-router": "^5.2.0"
-  },
-  "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
-    "@types/pdfkit": "^0.17.6",
-    "drizzle-kit": "^0.31.10"
   },
   "allowScripts": {
     "bcrypt@6.0.0": true,

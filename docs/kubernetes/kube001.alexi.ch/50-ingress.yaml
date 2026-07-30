@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: listomat-ingress
+  namespace: listomat
+  labels:
+    app: listomat
+  annotations:
+    cert-manager.io/cluster-issuer: lets-encrypt-alexi-ch
+spec:
+  ingressClassName: public
+  tls:
+    - hosts:
+        - listomat.alexi.ch
+      secretName: listomat-ingress-tls
+  rules:
+    - host: listomat.alexi.ch
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: listomat-service
+                port:
+                  name: http

@@ -142,6 +142,4 @@ Eine Liste soll als PDF und Excel exportiert werden können.
 
 Darstellung/Sortierung wie in der Oberfläche
 
-## TODO
-
 

@@ -157,6 +157,15 @@ Ergänzungen und Präzisierungen zu `Planung.md`. Bei Widerspruch gilt dieses Do
 - **Export Excel**: eigene Spalte «Anzahl» zwischen «Erledigt» und «Bezeichnung» (neu 4 Spalten: Erledigt, Anzahl, Bezeichnung, Kommentar).
 - **Etappen**: Umsetzung als E10 vor Docker eingeschoben; Docker wird E11.
 
+## E11 – Docker (Juli 2026)
+
+- **Prod-Image**: Multi-Stage `docker/Dockerfile` (node:24-slim für Build und Runtime, konsistent mit Dev statt `lts-slim`). Runtime enthält `.output/`, `drizzle/`, `/app/migrate.cjs` und das prod-`node_modules` (`npm prune --omit=dev`); kein drizzle-kit/tsx im Image. Rein bauzeitliche Pakete (`nuxt`, `@nuxtjs/i18n`, `vue`, `vue-router`, `vue-draggable-plus`) stehen in `devDependencies` und fallen beim Prune raus.
+- **libsql-Binding / Runtime-Deps** *(revidiert bei E12/K8s)*: `libsql` lädt sein natives Binding (`@libsql/linux-<arch>-gnu`) per dynamischem `require`, das Nitros Tracer nicht erkennt; zudem legt Nitro von `@libsql/*`/`js-base64` nur ESM-Teilkopien nach `.output/server/node_modules`. Statt einzelne Pakete manuell zu kopieren wird das vollständige prod-`node_modules` als `/app/node_modules` ins Runtime-Image übernommen; Node löst native Binding und `--external`-Deps per Upward-Resolution von dort auf.
+- **Migration + Seed** *(revidiert bei E12/K8s)*: eigenes CLI `server/db/migrate.ts` (drizzle-orm-Migrator statt drizzle-kit), im Build-Stage per esbuild nach **`/app/migrate.cjs`** gebündelt (oberste Ebene, nicht unter `.output/server/`, damit Nitros ESM-Teilkopien es nicht überschatten; `bcrypt`/`@libsql/client` extern → aus `/app/node_modules`). Command `node migrate.cjs`. Seed-Logik nach `server/db/seed-admin.ts` extrahiert; `seed.ts` (Dev-CLI via tsx) und `migrate.ts` nutzen sie gemeinsam.
+- **Compose Prod**: `docker-compose.prod.yml` mit Service `migrate` (gleiches Image, `restart: "no"`) und `app` (`depends_on: condition: service_completed_successfully`); gemeinsames Named Volume `listomat-data` → `/app/data`. `DB_URL`-Default (`file:/app/data/listomat.db`) ist im Image gesetzt; `NUXT_SESSION_PASSWORD` ist Pflicht-ENV.
+- **Multi-Arch**: 1 Image für linux/amd64 + linux/arm64 via `docker buildx`; Image-Name `registry.alexi.ch/listomat:latest`. npm-Script `docker:build-push` baut und pusht direkt in die Registry (ursprünglich ohne `--push` geplant, vom Entwickler angepasst).
+- **Dev-Setup**: `docker-compose.yml` + `docker/Dockerfile.dev` bleiben unverändert.
+
 ## Offen
 
 - (wird laufend ergänzt)

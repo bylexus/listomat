@@ -324,8 +324,88 @@ Kein UI-Framework. Verbindliche Bausteine:
 
 ## Docker
 
-- `Dockerfile`: Multi-Stage (build → node:lts-slim runtime), `node .output/server/index.mjs`.
-- Compose: Service `migrate` (gleiches Image, Command führt drizzle-kit-Migrationen + Seed aus, `restart: "no"`), Service `app` mit `depends_on: migrate: condition: service_completed_successfully`. Gemeinsames Volume für `data/` (SQLite-Datei). Session-Secret (`NUXT_SESSION_PASSWORD`) und DB-Pfad via ENV.
+- Dev (unverändert): `docker/Dockerfile.dev` + `docker-compose.yml`, Quellcode als Volume, Entrypoint installiert Dependencies, migriert, seedet, startet `nuxt dev`.
+- Prod: `docker/Dockerfile`, Multi-Stage (build → node:24-slim Runtime), `node .output/server/index.mjs`. Runtime-Image enthält `.output/`, `drizzle/` (Migrations-SQL), das Migrations-Bundle `/app/migrate.cjs` und das prod-`node_modules`. Migration + Seed als esbuild-Bundle **`/app/migrate.cjs`** (oberste Ebene, drizzle-orm-Migrator + Seed-Logik aus `server/db/migrate.ts`/`seed-admin.ts` – kein drizzle-kit/tsx im Runtime-Image), Command `node migrate.cjs`. Mountpoint `VOLUME /app/data` für die SQLite-DB, `DB_URL`-Default `file:/app/data/listomat.db`.
+  - `migrate.cjs` referenziert `@libsql/client` und `bcrypt` als `--external` (CJS); deren gesamter Abhängigkeitsbaum (`@libsql/*`, `js-base64`, native libsql-Binding, …) muss zur Laufzeit auflösbar sein. Nitros Tracer legt aber nur ESM-Teilkopien nach `.output/server/node_modules`, und Node löst Module vom *nächstgelegenen* `node_modules` – läge `migrate.cjs` unter `.output/server/`, würden diese Teilkopien das vollständige `node_modules` überschatten (fehlende `lib-cjs`-Entrypoints → `MODULE_NOT_FOUND`). Ein Overlay in `.output/server/node_modules` scheitert zudem, weil Nitro dort einzelne Pakete als *Datei* (statt Verzeichnis) ablegt. Lösung: `migrate.cjs` liegt auf `/app` (oberste Ebene), sein nächstgelegenes `node_modules` ist das echte, vollständige `/app/node_modules`. Die App (`.output/server/index.mjs`) findet ihre native libsql-Binding per Upward-Resolution ebenfalls dort.
+  - `npm prune --omit=dev` nach dem Build hält `/app/node_modules` prod-only. Rein bauzeitliche/clientseitige Pakete (`nuxt`, `@nuxtjs/i18n`, `vue`, `vue-router`, `vue-draggable-plus`) liegen in `devDependencies` (Nitro-Output ist standalone); serverseitige Runtime-Libs (`@libsql/client`, `bcrypt`, `drizzle-orm`, `exceljs`, `pdfkit`, `uuidv7`, `nuxt-auth-utils`) in `dependencies`. Der Multi-Stage-Build bleibt – erst dadurch enthält das Runtime-Image die Build-Toolchain (nuxt/vite) nicht mehr.
+- `docker-compose.prod.yml`: Service `migrate` (gleiches Image, Command `node migrate.cjs`, `restart: "no"`), Service `app` mit `depends_on: migrate: condition: service_completed_successfully`. Gemeinsames Named Volume `listomat-data` für `/app/data`. `NUXT_SESSION_PASSWORD` via ENV (Pflicht), Port via `APP_PORT`.
+- Multi-Arch-Build: `npm run docker:build-push` → `docker buildx build --push --platform linux/amd64,linux/arm64 -t registry.alexi.ch/listomat:latest`.
+
+## Kubernetes-Deployment (kube001.alexi.ch)
+
+Ziel: das bestehende Prod-Image `registry.alexi.ch/listomat:latest` als eigener Dienst im single-node microk8s-Cluster `kube001` betreiben. Manifests liegen unter `docs/kubernetes/kube001.alexi.ch/`.
+
+### Cluster-Gegebenheiten (per read-only kubectl ermittelt)
+
+- Single Node, Hostname `kube001`.
+- Ingress-Controller: `ingressClassName: public`; TLS via cert-manager `ClusterIssuer` `lets-encrypt-alexi-ch` (Secret wird automatisch angelegt).
+- Einzige StorageClass: `microk8s-hostpath` (default, Provisioner `microk8s.io/hostpath`, ReclaimPolicy Delete). **Nicht** verwendet – stattdessen manuell provisioniertes lokales PV (siehe unten), analog zum bestehenden Dienst `registry`.
+- Privates Registry-Image: Pods brauchen `imagePullSecrets: registry-alexich-cred` (Typ `dockerconfigjson`). Dieses Secret existiert nur in fremden Namespaces und muss im Namespace `listomat` neu angelegt werden.
+- Vorbild-Dienst `wichtelomat`: Deployment + ClusterIP-Service (Port 80 → benannter Port `http`) + Ingress mit cert-manager-Annotation. **Abweichung Listomat:** Container lauscht auf **3000** (Dockerfile `PORT=3000`), nicht 80.
+
+### Storage
+
+- Host-Verzeichnis (existiert bereits, leer): `/data/microk8s-storage/listomat-data` (der im Auftrag genannte Name `listomad-data` war ein Tippfehler; bestätigt auf `listomat-data`).
+- Manuell provisioniertes `PersistentVolume` (Muster wie `registry-data`):
+  - `spec.local.path: /data/microk8s-storage/listomat-data`
+  - `accessModes: [ReadWriteOnce]`, `persistentVolumeReclaimPolicy: Retain`, `volumeMode: Filesystem`
+  - `storageClassName: ""` (verhindert dynamisches Provisioning durch die Default-StorageClass)
+  - `nodeAffinity` → `kubernetes.io/hostname In [kube001]`
+  - `capacity.storage`: **Vorschlag 2Gi** (bei `local`/hostpath rein nominell, nicht erzwungen).
+- Passendes `PersistentVolumeClaim` im Namespace `listomat`: `storageClassName: ""`, `volumeName: listomat-data`, `accessModes: [ReadWriteOnce]`, `requests.storage: 2Gi`. Gemountet in Init- und App-Container unter `/app/data`.
+
+### Migration + Seed
+
+- Wie bei Docker Compose: **Migration als initContainer** (gleiches Image, Command `node migrate.cjs`), der das PVC unter `/app/data` mountet und vor dem App-Container läuft.
+- `migrate.cjs` (aus `server/db/migrate.ts`) führt **Migrationen und Admin-Seed** aus; `seedAdmin` ist idempotent (überspringt, wenn `admin@local` existiert). Es ist daher **keine Image-Anpassung** für den Admin-Seed nötig – der gewünschte «Auch Admin-Seed» ist bereits durch den Migrations-initContainer abgedeckt.
+- `DB_URL` kommt als Image-Default (`file:/app/data/listomat.db`) und gilt für Init- wie App-Container.
+- **Sicherheitshinweis:** Der Seed legt `admin@local` / `admin` an. Passwort nach erstem Login in Prod ändern.
+
+### Secrets (committed mit Platzhaltern)
+
+Beide Secrets werden als YAML im Repo abgelegt, mit klar markierten Platzhalter-Werten zum Ausfüllen (kein echter Wert im Git):
+
+1. `registry-alexich-cred` (Typ `kubernetes.io/dockerconfigjson`): Kopie des Registry-Pull-Secrets für den Namespace `listomat`. Platzhalter für `.dockerconfigjson`; Erzeugung z.B. via
+   `kubectl create secret docker-registry registry-alexich-cred --docker-server=registry.alexi.ch --docker-username=<user> --docker-password=<pw> -n listomat --dry-run=client -o yaml`.
+2. `listomat-env` (Typ `Opaque`): **ein** Env-Secret mit allen App-Umgebungsvariablen, per `envFrom.secretRef` in **beide** Container (Migrations-initContainer und App) injiziert. Enthält:
+   - `NUXT_SESSION_PASSWORD` – **mindestens 32 Zeichen** (Anforderung nuxt-auth-utils), Pflicht.
+   - `DB_URL` – `file:/app/data/listomat.db` (identisch zum Image-Default; zentral hier definiert/überschreibbar).
+
+   Im Code tatsächlich gelesene Env-Variablen (verifiziert): nur `DB_URL` (`server/db/index.ts`) und `NUXT_SESSION_PASSWORD` (nuxt-auth-utils). `NODE_ENV`/`HOST`/`PORT` sind Image-Defaults und bleiben dort.
+
+### Manifests (Namensschema mit Reihenfolge-Präfix)
+
+Ablage in `docs/kubernetes/kube001.alexi.ch/`:
+
+| Datei | Inhalt |
+| --- | --- |
+| `00-namespace.yaml` | Namespace `listomat` |
+| `10-pv.yaml` | PersistentVolume `listomat-data` (local, kube001) |
+| `11-pvc.yaml` | PVC `listomat-data` im Namespace `listomat` |
+| `20-secrets.yaml` | `registry-alexich-cred` + `listomat-env` (Platzhalter) |
+| `30-deployment.yaml` | Deployment `listomat` (initContainer migrate + App) |
+| `40-service.yaml` | ClusterIP-Service `listomat-service` |
+| `50-ingress.yaml` | Ingress `listomat-ingress` (TLS, host listomat.alexi.ch) |
+
+### Deployment-Details (`30-deployment.yaml`)
+
+- `replicas: 1`, `strategy.type: Recreate` – bei RWO-Volume + single-node darf kein zweiter Pod parallel mounten (RollingUpdate würde blockieren).
+- `imagePullSecrets: [registry-alexich-cred]`, Image `registry.alexi.ch/listomat:latest`, `imagePullPolicy: Always`.
+- `initContainers: [migrate]` – Image wie oben, `command: ["node", "migrate.cjs"]`, `envFrom: [secretRef: listomat-env]`, VolumeMount `/app/data`.
+- App-Container `listomat`: Port `containerPort: 3000` (Name `http`), VolumeMount `/app/data`, `envFrom: [secretRef: listomat-env]`.
+- Volume: `persistentVolumeClaim: listomat-data`.
+- **Ressourcen (Vorschlag, anpassbar):** requests `cpu: 50m`, `memory: 128Mi`; limits `cpu: 500m`, `memory: 512Mi` (Node/Nuxt-Runtime braucht mehr als die 128M von wichtelomat).
+- **Probes (Vorschlag):** `readinessProbe` httpGet `/login` Port 3000; `livenessProbe` tcpSocket Port 3000. (Pfad/Details in der Umsetzung verifizieren.)
+
+### Service & Ingress
+
+- `40-service.yaml`: `type: ClusterIP`, Port `80` Name `http` → `targetPort: 3000`, Selector `app: listomat`.
+- `50-ingress.yaml`: `ingressClassName: public`; Annotation `cert-manager.io/cluster-issuer: lets-encrypt-alexi-ch`; Rule host `listomat.alexi.ch`, Path `/` (Prefix) → Service `listomat-service` Port `http`; `tls` hosts `[listomat.alexi.ch]` Secret `listomat-ingress-tls` (von cert-manager befüllt).
+
+### Offene Punkte / Annahmen zur Freigabe
+
+- PV-Kapazität 2Gi, Ressourcen-Limits und Probe-Pfad sind Vorschläge – vor/bei Umsetzung bestätigen.
+- Voraussetzung im Cluster (Schreib-Operationen, nicht durch diese Manifests abgedeckt bzw. Platzhalter): echte Werte für beide Secrets eintragen; DNS `listomat.alexi.ch` → Cluster-Ingress.
 
 ## Etappen
 
@@ -382,6 +462,10 @@ Prüfpunkte: beide Formate mit status=current und status=empty; PDF zweispaltig,
 Schema-Feld `entries.quantity` (nullable int) + Migration; `optionalInt` in validate.ts; PATCH-Routen für Vorlagen- und Listen-Einträge um `quantity` erweitern; Kopierlogik kopiert `quantity` mit; Nummern-Feld im Eintrag (Listen-Detail und Vorlagen-Seite, zwischen Name und Kommentar); Export PDF (Präfix «5×») und Excel (Spalte «Anzahl»).
 Prüfpunkte: Anzahl setzen/ändern/löschen (leer) auf Vorlagen- und Listen-Einträgen, überlebt Reload; 0 wird angezeigt; Kopieren (Vorlage→Liste, Liste→Vorlage, Duplizieren) übernimmt die Anzahl; PDF und Excel zeigen die Anzahl gemäss Layout; bestehende Einträge (Migration) ohne Anzahl.
 
-**E11 – Docker** *(ehemals E10)*
-Dockerfile, Compose mit Migrations-Init-Container.
-Prüfpunkte: `docker compose up` auf leerem Volume → Migration + Seed laufen, App erreichbar, Daten überleben Neustart.
+**E11 – Docker** *(ehemals E10; umgesetzt, Freigabe durch manuellen Test ausstehend)*
+Prod-Dockerfile (`docker/Dockerfile`), `docker-compose.prod.yml` mit Migrations-Init-Container, npm-Script `docker:build-push` (Multi-Arch amd64+arm64), `.dockerignore`. Details siehe Abschnitt «Docker».
+Prüfpunkte: `npm run docker:build-push` baut beide Plattformen; `docker compose -f docker-compose.prod.yml up` auf leerem Volume → Migration + Seed laufen, App erreichbar, Login admin@local/admin, Daten überleben Neustart; Dev-Setup (`docker compose up`) funktioniert unverändert.
+
+**E12 – Kubernetes-Deployment (kube001.alexi.ch)** *(Manifests erstellt, noch nicht angewendet; Freigabe/Deploy ausstehend)*
+Manifests unter `docs/kubernetes/kube001.alexi.ch/` gemäss Abschnitt «Kubernetes-Deployment (kube001.alexi.ch)»: Namespace, lokales PV + PVC (`/data/microk8s-storage/listomat-data`), Secrets (Pull-Secret + Env-Secret `listomat-env`, Platzhalter), Deployment (Migrations-initContainer + App, Port 3000, `Recreate`), ClusterIP-Service, Ingress (`listomat.alexi.ch`, cert-manager `lets-encrypt-alexi-ch`).
+Prüfpunkte: `kubectl apply` legt alle Objekte an; PVC bindet an das lokale PV; initContainer `migrate` läuft durch (Migration + Seed); App-Pod `Ready`; `https://listomat.alexi.ch` erreichbar mit gültigem Zertifikat; Login admin@local/admin; Daten überleben Pod-Neustart.
