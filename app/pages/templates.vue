@@ -93,14 +93,25 @@
           </div>
         </VueDraggable>
 
-        <input
-          v-model="newEntryDrafts[group.id]"
-          type="text"
-          class="entry-add-input"
-          :placeholder="t('templates.addEntryPlaceholder')"
-          @keydown.enter.prevent="addEntry(group)"
-          @blur="addEntry(group)"
-        />
+        <div class="entry-add-row">
+          <input
+            v-model="newEntryDrafts[group.id].name"
+            type="text"
+            class="entry-add-input"
+            :placeholder="t('templates.addEntryPlaceholder')"
+            @keydown.enter.prevent="addEntry(group)"
+          />
+          <input
+            v-model="newEntryDrafts[group.id].quantity"
+            type="number"
+            min="0"
+            class="entry-add-quantity"
+            placeholder="0"
+            :title="t('templates.quantityLabel')"
+            @keydown.enter.prevent="addEntry(group)"
+            @blur="addEntry(group)"
+          />
+        </div>
       </div>
     </VueDraggable>
   </div>
@@ -138,12 +149,18 @@ const { confirm } = useConfirm()
 
 const groupList = ref<TemplateGroup[]>([])
 const loading = ref(false)
-const newEntryDrafts = reactive<Record<string, string>>({})
+const newEntryDrafts = reactive<Record<string, { name: string; quantity: string }>>({})
 const groupNameRefs = new Map<string, HTMLElement>()
 
 function setGroupNameRef(id: string, el: any) {
   if (el) groupNameRefs.set(id, el as HTMLElement)
   else groupNameRefs.delete(id)
+}
+
+function ensureDraft(groupId: string) {
+  if (!newEntryDrafts[groupId]) {
+    newEntryDrafts[groupId] = { name: '', quantity: '' }
+  }
 }
 
 function blurTarget(event: Event) {
@@ -153,7 +170,10 @@ function blurTarget(event: Event) {
 async function loadTemplates() {
   loading.value = true
   const result = await call(() => $fetch<TemplateGroup[]>('/api/templates'))
-  if (result) groupList.value = result
+  if (result) {
+    groupList.value = result
+    for (const group of result) ensureDraft(group.id)
+  }
   loading.value = false
 }
 
@@ -164,6 +184,7 @@ async function addGroup() {
   )
   if (!result) return
   groupList.value.push(result)
+  ensureDraft(result.id)
   // Direkt nach dem Anlegen den Gruppennamen fokussieren, damit der Name
   // ohne weiteren Klick überschrieben werden kann.
   await nextTick()
@@ -204,14 +225,23 @@ async function onGroupDragEnd() {
 }
 
 async function addEntry(group: TemplateGroup) {
-  const draft = (newEntryDrafts[group.id] || '').trim()
-  if (!draft) return
+  const draft = newEntryDrafts[group.id]
+  const name = String(draft?.name ?? '').trim()
+  if (!name) return
+  const quantityRaw = draft?.quantity
+  const quantity =
+    quantityRaw === '' || quantityRaw === null || quantityRaw === undefined
+      ? null
+      : Number(quantityRaw)
   const result = await call(() =>
-    $fetch<TemplateEntry>(`/api/templates/${group.id}/entries`, { method: 'POST', body: { name: draft } })
+    $fetch<TemplateEntry>(`/api/templates/${group.id}/entries`, {
+      method: 'POST',
+      body: { name, quantity }
+    })
   )
   if (result) {
     group.entries.push(result)
-    newEntryDrafts[group.id] = ''
+    newEntryDrafts[group.id] = { name: '', quantity: '' }
   }
 }
 
@@ -372,7 +402,28 @@ onMounted(loadTemplates)
   font-style: italic;
 }
 
+.entry-add-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
 .entry-add-input {
+  flex: 1;
+  min-width: 0;
   border-style: dashed;
+}
+.entry-add-quantity {
+  flex: 0 0 4rem;
+  width: 4rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.entry-add-quantity::-webkit-inner-spin-button,
+.entry-add-quantity::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 </style>

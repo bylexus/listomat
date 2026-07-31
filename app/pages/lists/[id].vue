@@ -153,14 +153,25 @@
           </div>
         </VueDraggable>
 
-        <input
-          v-model="newEntryDrafts[group.id]"
-          type="text"
-          class="entry-add-input"
-          :placeholder="t('listDetail.addEntryPlaceholder')"
-          @keydown.enter.prevent="addEntry(group)"
-          @blur="addEntry(group)"
-        />
+        <div class="entry-add-row">
+          <input
+            v-model="newEntryDrafts[group.id].name"
+            type="text"
+            class="entry-add-input"
+            :placeholder="t('listDetail.addEntryPlaceholder')"
+            @keydown.enter.prevent="addEntry(group)"
+          />
+          <input
+            v-model="newEntryDrafts[group.id].quantity"
+            type="number"
+            min="0"
+            class="entry-add-quantity"
+            placeholder="0"
+            :title="t('listDetail.quantityLabel')"
+            @keydown.enter.prevent="addEntry(group)"
+            @blur="addEntry(group)"
+          />
+        </div>
       </div>
     </VueDraggable>
 
@@ -301,11 +312,17 @@ const router = useRouter()
 
 const listId = route.params.id as string
 const list = ref<ListDetail | null>(null)
-const newEntryDrafts = reactive<Record<string, string>>({})
+const newEntryDrafts = reactive<Record<string, { name: string; quantity: string }>>({})
 const titleEl = ref<HTMLElement | null>(null)
 
 function setTitleRef(el: any) {
   titleEl.value = (el as HTMLElement) ?? null
+}
+
+function ensureDraft(groupId: string) {
+  if (!newEntryDrafts[groupId]) {
+    newEntryDrafts[groupId] = { name: '', quantity: '' }
+  }
 }
 
 const groupDialogOpen = ref(false)
@@ -340,6 +357,7 @@ async function loadList() {
   const result = await call(() => $fetch<ListDetail>(`/api/lists/${listId}`))
   if (result) {
     list.value = result
+    for (const group of result.groups) ensureDraft(group.id)
     if (consume('list', listId)) {
       await nextTick()
       focusAndSelect(titleEl.value)
@@ -389,6 +407,7 @@ async function createGroup() {
   if (result) {
     result.entries = result.entries ?? []
     list.value.groups.push(result)
+    ensureDraft(result.id)
     groupDialogOpen.value = false
   }
 }
@@ -403,6 +422,7 @@ async function insertTemplate() {
   )
   if (result) {
     list.value.groups.push(result)
+    ensureDraft(result.id)
     groupDialogOpen.value = false
   }
 }
@@ -465,14 +485,23 @@ async function onGroupDragEnd() {
 // --- Einträge ---
 
 async function addEntry(group: ListGroup) {
-  const draft = (newEntryDrafts[group.id] || '').trim()
-  if (!draft) return
+  const draft = newEntryDrafts[group.id]
+  const name = String(draft?.name ?? '').trim()
+  if (!name) return
+  const quantityRaw = draft?.quantity
+  const quantity =
+    quantityRaw === '' || quantityRaw === null || quantityRaw === undefined
+      ? null
+      : Number(quantityRaw)
   const result = await call(() =>
-    $fetch<ListEntry>(`/api/lists/${listId}/groups/${group.id}/entries`, { method: 'POST', body: { name: draft } })
+    $fetch<ListEntry>(`/api/lists/${listId}/groups/${group.id}/entries`, {
+      method: 'POST',
+      body: { name, quantity }
+    })
   )
   if (result) {
     group.entries.push(result)
-    newEntryDrafts[group.id] = ''
+    newEntryDrafts[group.id] = { name: '', quantity: '' }
   }
 }
 
@@ -788,10 +817,37 @@ onMounted(loadList)
 .entry-comment:focus {
   outline: 2px solid var(--color-primary);
 }
+.entry-add-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
 .entry-add-input {
+  flex: 1;
+  min-width: 0;
   border: none;
   background: transparent;
   padding: var(--space-1) 4px;
+}
+.entry-add-quantity {
+  width: 2.5rem;
+  flex-shrink: 0;
+  font-size: inherit;
+  border: none;
+  padding: 1px 4px;
+  background: transparent;
+  color: var(--color-text-muted);
+  text-align: right;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.entry-add-quantity::-webkit-inner-spin-button,
+.entry-add-quantity::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.entry-add-quantity:focus {
+  outline: 2px solid var(--color-primary);
 }
 .dialog-row {
   display: flex;
