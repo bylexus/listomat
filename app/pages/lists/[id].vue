@@ -754,6 +754,13 @@ onMounted(loadList)
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  padding: var(--space-1) var(--space-1);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.entry-row:nth-child(even) {
+  background: var(--color-background);
 }
 .entry-done {
   flex-shrink: 0;
@@ -767,7 +774,7 @@ onMounted(loadList)
 }
 .entry-main {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-1);
 }
 .entry-name {

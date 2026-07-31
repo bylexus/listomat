@@ -60,32 +60,36 @@
                 <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
               </svg>
             </span>
-            <span
-              class="entry-name"
-              contenteditable="true"
-              spellcheck="false"
-              @blur="onEntryNameBlur(group, entry, $event)"
-              @keydown.enter.prevent="blurTarget($event)"
-            >{{ entry.name }}</span>
-            <input
-              class="entry-quantity"
-              type="number"
-              min="0"
-              placeholder="0"
-              :title="t('templates.quantityLabel')"
-              :value="entry.quantity ?? ''"
-              @blur="onEntryQuantityBlur(group, entry, $event)"
-              @keydown.enter.prevent="blurTarget($event)"
-            />
-            <input
-              class="entry-comment"
-              type="text"
-              :value="entry.comment ?? ''"
-              :placeholder="t('templates.commentPlaceholder')"
-              @blur="onEntryCommentBlur(group, entry, $event)"
-              @keydown.enter.prevent="blurTarget($event)"
-            />
-            <button class="btn btn-ghost" type="button" :title="t('templates.deleteEntry')" @click="deleteEntry(group, entry)">
+            <div class="entry-texts">
+              <div class="entry-main">
+                <span
+                  class="entry-name"
+                  contenteditable="true"
+                  spellcheck="false"
+                  @blur="onEntryNameBlur(group, entry, $event)"
+                  @keydown.enter.prevent="blurTarget($event)"
+                >{{ entry.name }}</span>
+                <input
+                  class="entry-quantity"
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  :title="t('templates.quantityLabel')"
+                  :value="entry.quantity ?? ''"
+                  @blur="onEntryQuantityBlur(group, entry, $event)"
+                  @keydown.enter.prevent="blurTarget($event)"
+                />
+              </div>
+              <input
+                class="entry-comment"
+                type="text"
+                :value="entry.comment ?? ''"
+                :placeholder="t('templates.commentPlaceholder')"
+                @blur="onEntryCommentBlur(group, entry, $event)"
+                @keydown.enter.prevent="blurTarget($event)"
+              />
+            </div>
+            <button class="btn btn-ghost entry-delete" type="button" :title="t('templates.deleteEntry')" @click="deleteEntry(group, entry)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -374,10 +378,31 @@ onMounted(loadTemplates)
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  padding: var(--space-1) var(--space-1);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.entry-row:nth-child(even) {
+  background: var(--color-background);
+}
+
+.entry-texts {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.entry-main {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
 }
 
 .entry-name {
-  flex: 2;
+  flex: 1;
+  min-width: 0;
   padding: 0.15rem 0.35rem;
   border-radius: var(--radius);
   outline: none;
@@ -389,23 +414,53 @@ onMounted(loadTemplates)
 }
 
 .entry-quantity {
-  flex: 0 0 4rem;
-  width: 4rem;
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
   padding: 0.15rem 0.35rem;
+  border: none;
+  background: transparent;
   border-radius: var(--radius);
   color: var(--color-text-muted);
+  text-align: right;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.entry-quantity::-webkit-inner-spin-button,
+.entry-quantity::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.entry-quantity:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -1px;
 }
 
 .entry-comment {
-  flex: 2;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.35rem;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius);
   color: var(--color-text-muted);
   font-style: italic;
+}
+
+.entry-comment:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -1px;
+}
+
+.entry-delete,
+.entry-drag-handle {
+  align-self: flex-start;
 }
 
 .entry-add-row {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 .entry-add-input {
   flex: 1;
@@ -413,11 +468,12 @@ onMounted(loadTemplates)
   border-style: dashed;
 }
 .entry-add-quantity {
-  flex: 0 0 4rem;
-  width: 4rem;
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
   padding: 0.15rem 0.35rem;
   border-radius: var(--radius);
   color: var(--color-text-muted);
+  text-align: right;
   appearance: textfield;
   -moz-appearance: textfield;
 }
