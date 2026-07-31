@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="templates-grid-shell">
     <div class="page-header toolbar">
       <h1>{{ t('nav.templates') }}</h1>
       <button class="btn btn-primary" type="button" @click="addGroup">
@@ -8,17 +8,18 @@
       </button>
     </div>
 
-    <p v-if="loading" class="empty-state">…</p>
-    <p v-else-if="groupList.length === 0" class="empty-state">{{ t('templates.empty') }}</p>
+    <div class="templates-scroll">
+      <p v-if="loading" class="empty-state">…</p>
+      <p v-else-if="groupList.length === 0" class="empty-state">{{ t('templates.empty') }}</p>
 
-    <VueDraggable
-      v-else
-      v-model="groupList"
-      class="groups-grid"
-      :animation="150"
-      handle=".group-drag-handle"
-      @end="onGroupDragEnd"
-    >
+      <VueDraggable
+        v-else
+        v-model="groupList"
+        class="groups-grid"
+        :animation="150"
+        handle=".group-drag-handle"
+        @end="onGroupDragEnd"
+      >
       <div v-for="group in groupList" :key="group.id" class="card group-card">
         <div class="group-card-header">
           <span class="drag-handle group-drag-handle" :title="t('templates.dragGroup')">
@@ -104,6 +105,7 @@
         </div>
       </div>
     </VueDraggable>
+    </div>
   </div>
 </template>
 
@@ -303,6 +305,16 @@ onMounted(loadTemplates)
 .page-header {
   justify-content: space-between;
   margin-bottom: 1rem;
+}
+.templates-grid-shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  min-height: 0;
+}
+.templates-scroll {
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .empty-state {

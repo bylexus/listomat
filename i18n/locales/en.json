@@ -6,7 +6,8 @@
     "lists": "Lists",
     "templates": "Templates",
     "admin": "Administration",
-    "logout": "Logout"
+    "logout": "Logout",
+    "menu": "Menu"
   },
   "auth": {
     "email": "Email",

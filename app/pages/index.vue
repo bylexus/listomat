@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="lists-grid-shell">
     <div class="page-header toolbar">
       <h1>{{ t('nav.lists') }}</h1>
       <button class="btn btn-primary" type="button" @click="addList">
@@ -8,54 +8,56 @@
       </button>
     </div>
 
-    <p v-if="loading" class="empty-state">…</p>
+    <div class="lists-scroll">
+      <p v-if="loading" class="empty-state">…</p>
 
-    <template v-else>
-      <section>
-        <h2 class="section-title">{{ t('lists.mine') }}</h2>
-        <p v-if="own.length === 0" class="empty-state">{{ t('lists.empty') }}</p>
-        <div v-else class="lists-grid">
-          <div v-for="list in own" :key="list.id" class="card list-card clickable" @click="openList(list, $event)">
-            <div class="list-card-header">
-              <h3
-                :ref="(el) => setNameRef(list.id, el)"
-                class="list-name"
-                :contenteditable="editingListId === list.id ? 'true' : 'false'"
-                spellcheck="false"
-                @blur="onRenameList(list, $event)"
-                @keydown.enter.prevent="blurTarget($event)"
-              >{{ list.name }}</h3>
-              <button class="btn btn-ghost" type="button" :title="t('lists.rename')" @click="focusName(list.id)">
-                <Edit />
-              </button>
-              <button class="btn btn-ghost" type="button" :title="t('lists.duplicate')" @click="duplicateList(list)">
-                <Duplicate />
-              </button>
-              <button class="btn btn-ghost" type="button" :title="t('lists.deleteList')" @click="confirmDeleteList(list)">
-                <Trash />
-              </button>
+      <template v-else>
+        <section>
+          <h2 class="section-title">{{ t('lists.mine') }}</h2>
+          <p v-if="own.length === 0" class="empty-state">{{ t('lists.empty') }}</p>
+          <div v-else class="lists-grid">
+            <div v-for="list in own" :key="list.id" class="card list-card clickable" @click="openList(list, $event)">
+              <div class="list-card-header">
+                <h3
+                  :ref="(el) => setNameRef(list.id, el)"
+                  class="list-name"
+                  :contenteditable="editingListId === list.id ? 'true' : 'false'"
+                  spellcheck="false"
+                  @blur="onRenameList(list, $event)"
+                  @keydown.enter.prevent="blurTarget($event)"
+                >{{ list.name }}</h3>
+                <button class="btn btn-ghost" type="button" :title="t('lists.rename')" @click="focusName(list.id)">
+                  <Edit />
+                </button>
+                <button class="btn btn-ghost" type="button" :title="t('lists.duplicate')" @click="duplicateList(list)">
+                  <Duplicate />
+                </button>
+                <button class="btn btn-ghost" type="button" :title="t('lists.deleteList')" @click="confirmDeleteList(list)">
+                  <Trash />
+                </button>
+              </div>
+              <UiProgress :done="list.progress.done" :total="list.progress.total" />
             </div>
-            <UiProgress :done="list.progress.done" :total="list.progress.total" />
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section v-if="shared.length > 0">
-        <h2 class="section-title">{{ t('lists.sharedWithMe') }}</h2>
-        <div class="lists-grid">
-          <div v-for="list in shared" :key="list.id" class="card list-card clickable" @click="openList(list, $event)">
-            <div class="list-card-header">
-              <h3 class="list-name">{{ list.name }}</h3>
-              <button class="btn btn-ghost" type="button" :title="t('lists.duplicate')" @click="duplicateList(list)">
-                <Duplicate />
-              </button>
+        <section v-if="shared.length > 0">
+          <h2 class="section-title">{{ t('lists.sharedWithMe') }}</h2>
+          <div class="lists-grid">
+            <div v-for="list in shared" :key="list.id" class="card list-card clickable" @click="openList(list, $event)">
+              <div class="list-card-header">
+                <h3 class="list-name">{{ list.name }}</h3>
+                <button class="btn btn-ghost" type="button" :title="t('lists.duplicate')" @click="duplicateList(list)">
+                  <Duplicate />
+                </button>
+              </div>
+              <p class="list-owner">{{ t('lists.byOwner', { name: list.ownerName }) }}</p>
+              <UiProgress :done="list.progress.done" :total="list.progress.total" />
             </div>
-            <p class="list-owner">{{ t('lists.byOwner', { name: list.ownerName }) }}</p>
-            <UiProgress :done="list.progress.done" :total="list.progress.total" />
           </div>
-        </div>
-      </section>
-    </template>
+        </section>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -185,6 +187,16 @@ onMounted(loadLists)
 .page-header {
   justify-content: space-between;
   margin-bottom: var(--space-3);
+}
+.lists-grid-shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  min-height: 0;
+}
+.lists-scroll {
+  overflow-y: auto;
+  min-height: 0;
 }
 .section-title {
   font-size: 1rem;

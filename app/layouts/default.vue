@@ -14,11 +14,33 @@
         <NuxtLink v-if="user?.role === 'admin'" to="/admin/users">{{ t('nav.admin') }}</NuxtLink>
       </nav>
       <div v-else class="app-nav" />
-      <div class="app-lang">
-        <select :value="locale" :aria-label="t('app.title')" @change="onLocaleChange">
-          <option v-for="l in availableLocales" :key="l.code" :value="l.code">{{ l.name }}</option>
-        </select>
-        <button v-if="loggedIn" class="btn btn-ghost" type="button" @click="logout">{{ t('nav.logout') }}</button>
+      <div ref="menuRef" class="app-menu">
+        <button
+          class="btn btn-ghost app-menu-trigger"
+          type="button"
+          :aria-label="t('nav.menu')"
+          :aria-expanded="menuOpen"
+          aria-haspopup="true"
+          @click="menuOpen = !menuOpen"
+        >
+          <Menu :width="20" :height="20" />
+        </button>
+        <div v-if="menuOpen" class="app-menu-panel" role="menu">
+          <label class="app-menu-locale">
+            <select :value="locale" :aria-label="t('app.title')" @change="onLocaleChange">
+              <option v-for="l in availableLocales" :key="l.code" :value="l.code">{{ l.name }}</option>
+            </select>
+          </label>
+          <button
+            v-if="loggedIn"
+            class="btn btn-ghost app-menu-item"
+            type="button"
+            role="menuitem"
+            @click="onLogout"
+          >
+            {{ t('nav.logout') }}
+          </button>
+        </div>
       </div>
     </header>
     <main class="app-main">
@@ -28,6 +50,8 @@
 </template>
 
 <script setup lang="ts">
+import Menu from '~/assets/icons/Menu.vue'
+
 const { t, locale, locales, setLocale } = useI18n()
 const availableLocales = computed(() => locales.value)
 
@@ -39,7 +63,15 @@ async function onLocaleChange(event: Event) {
 const { loggedIn, user, session, clear, fetch: refreshSession } = useUserSession()
 const { call } = useApi()
 
-async function logout() {
+const menuOpen = ref(false)
+const menuRef = ref<HTMLElement | null>(null)
+
+function closeMenu() {
+  menuOpen.value = false
+}
+
+async function onLogout() {
+  closeMenu()
   await clear()
   await navigateTo('/login')
 }
@@ -49,13 +81,38 @@ async function stopImpersonation() {
   await refreshSession()
   await navigateTo('/admin/users')
 }
+
+function onDocumentMouseDown(event: MouseEvent) {
+  if (!menuOpen.value) return
+  const root = menuRef.value
+  if (root && !root.contains(event.target as Node)) {
+    closeMenu()
+  }
+}
+
+function onDocumentKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape' && menuOpen.value) {
+    closeMenu()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('mousedown', onDocumentMouseDown)
+  document.addEventListener('keydown', onDocumentKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', onDocumentMouseDown)
+  document.removeEventListener('keydown', onDocumentKeydown)
+})
 </script>
 
 <style scoped>
 .app-shell {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 .app-header {
   display: flex;
@@ -75,15 +132,41 @@ async function stopImpersonation() {
   gap: 1rem;
   flex: 1;
 }
-.app-lang {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.app-menu {
+  position: relative;
+  margin-left: auto;
 }
-.app-lang select {
-  width: auto;
+.app-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+}
+.app-menu-panel {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  min-width: 12rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 20;
+}
+.app-menu-locale select {
+  width: 100%;
+}
+.app-menu-item {
+  justify-content: flex-start;
 }
 .app-main {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
   padding: 1rem;
 }
 .impersonation-banner {

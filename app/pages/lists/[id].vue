@@ -1,53 +1,56 @@
 <template>
-  <div v-if="list">
-    <div class="page-header toolbar">
-      <h1
-        v-if="list.isOwner"
-        :ref="(el) => setTitleRef(el)"
-        class="list-title"
-        contenteditable="true"
-        spellcheck="false"
-        @blur="onRenameList($event)"
-        @keydown.enter.prevent="blurTarget($event)"
-      >{{ list.name }}</h1>
-      <h1 v-else class="list-title">{{ list.name }}</h1>
+  <div v-if="list" class="list-detail-grid">
+    <div class="list-detail-top">
+      <div class="page-header toolbar">
+        <h1
+          v-if="list.isOwner"
+          :ref="(el) => setTitleRef(el)"
+          class="list-title"
+          contenteditable="true"
+          spellcheck="false"
+          @blur="onRenameList($event)"
+          @keydown.enter.prevent="blurTarget($event)"
+        >{{ list.name }}</h1>
+        <h1 v-else class="list-title">{{ list.name }}</h1>
 
-      <div class="toolbar">
-        <button class="btn btn-primary" type="button" @click="openGroupDialog">
-          <Plus :width="16" :height="16" />
-          {{ t('listDetail.newGroup') }}
-        </button>
-        <button class="btn" type="button" :title="t('listDetail.reset')" @click="confirmReset">
-          <Reset :width="16" :height="16" />
-          {{ t('listDetail.reset') }}
-        </button>
-        <button class="btn" type="button" :title="t('listDetail.duplicate')" @click="duplicateList">
-          <Duplicate :width="16" :height="16" />
-          {{ t('listDetail.duplicate') }}
-        </button>
-        <button class="btn" type="button" :title="t('listDetail.export')" @click="openExportDialog">
-          <ExportIcon :width="16" :height="16" />
-          {{ t('listDetail.export') }}
-        </button>
-        <button v-if="list.isOwner" class="btn" type="button" :title="t('listDetail.share')" @click="openShareDialog">
-          <Share :width="16" :height="16" />
-          {{ t('listDetail.share') }}
-        </button>
+        <div class="toolbar">
+          <button class="btn btn-primary btn-icon" type="button" :title="t('listDetail.newGroup')" @click="openGroupDialog">
+            <Plus :width="16" :height="16" />
+            <span class="btn-label">{{ t('listDetail.newGroup') }}</span>
+          </button>
+          <button class="btn btn-icon" type="button" :title="t('listDetail.reset')" @click="confirmReset">
+            <Reset :width="16" :height="16" />
+            <span class="btn-label">{{ t('listDetail.reset') }}</span>
+          </button>
+          <button class="btn btn-icon" type="button" :title="t('listDetail.duplicate')" @click="duplicateList">
+            <Duplicate :width="16" :height="16" />
+            <span class="btn-label">{{ t('listDetail.duplicate') }}</span>
+          </button>
+          <button class="btn btn-icon" type="button" :title="t('listDetail.export')" @click="openExportDialog">
+            <ExportIcon :width="16" :height="16" />
+            <span class="btn-label">{{ t('listDetail.export') }}</span>
+          </button>
+          <button v-if="list.isOwner" class="btn btn-icon" type="button" :title="t('listDetail.share')" @click="openShareDialog">
+            <Share :width="16" :height="16" />
+            <span class="btn-label">{{ t('listDetail.share') }}</span>
+          </button>
+        </div>
       </div>
+
+      <UiProgress v-if="totalEntries > 0" class="list-progress" :done="totalDone" :total="totalEntries" />
     </div>
 
-    <UiProgress v-if="totalEntries > 0" class="list-progress" :done="totalDone" :total="totalEntries" />
+    <div class="list-detail-body">
+      <p v-if="list.groups.length === 0" class="empty-state">{{ t('listDetail.empty') }}</p>
 
-    <p v-if="list.groups.length === 0" class="empty-state">{{ t('listDetail.empty') }}</p>
-
-    <VueDraggable
-      v-else
-      v-model="list.groups"
-      class="groups-grid"
-      :animation="150"
-      handle=".group-drag-handle"
-      @end="onGroupDragEnd"
-    >
+      <VueDraggable
+        v-else
+        v-model="list.groups"
+        class="groups-grid"
+        :animation="150"
+        handle=".group-drag-handle"
+        @end="onGroupDragEnd"
+      >
       <div v-for="group in list.groups" :key="group.id" class="card group-card">
         <div class="group-card-header">
           <span class="drag-handle group-drag-handle" :title="t('listDetail.dragGroup')">
@@ -150,6 +153,7 @@
         </div>
       </div>
     </VueDraggable>
+    </div>
 
     <UiModal :open="groupDialogOpen" @close="groupDialogOpen = false">
       <template #header>{{ t('listDetail.newGroupTitle') }}</template>
@@ -670,6 +674,32 @@ onMounted(loadList)
   justify-content: space-between;
   flex-wrap: wrap;
   margin-bottom: var(--space-3);
+}
+.list-detail-grid {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  min-height: 0;
+}
+.list-detail-top {
+  min-height: 0;
+}
+.list-detail-body {
+  overflow-y: auto;
+  min-height: 0;
+}
+.btn-label {
+  display: none;
+}
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+@media (min-width: 768px) {
+  .btn-label {
+    display: inline;
+  }
 }
 .list-title {
   margin: 0;
