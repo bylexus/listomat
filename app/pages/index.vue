@@ -128,6 +128,7 @@ async function loadLists() {
 }
 
 async function addList() {
+  const { mark } = useFocusNewItem()
   const result = await call(() =>
     $fetch<{ id: string; name: string; updatedAt: string }>('/api/lists', {
       method: 'POST',
@@ -135,7 +136,9 @@ async function addList() {
     })
   )
   if (!result) return
-  // Anlegen öffnet direkt das Detail
+  // Anlegen öffnet direkt das Detail und markiert die Liste,
+  // damit der Titel dort einmalig fokussiert/selektiert wird.
+  mark('list', result.id)
   await navigateTo(`/lists/${result.id}`)
 }
 

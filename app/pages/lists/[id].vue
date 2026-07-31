@@ -3,6 +3,7 @@
     <div class="page-header toolbar">
       <h1
         v-if="list.isOwner"
+        :ref="(el) => setTitleRef(el)"
         class="list-title"
         contenteditable="true"
         spellcheck="false"
@@ -301,6 +302,11 @@ const router = useRouter()
 const listId = route.params.id as string
 const list = ref<ListDetail | null>(null)
 const newEntryDrafts = reactive<Record<string, string>>({})
+const titleEl = ref<HTMLElement | null>(null)
+
+function setTitleRef(el: any) {
+  titleEl.value = (el as HTMLElement) ?? null
+}
 
 const groupDialogOpen = ref(false)
 const newGroupName = ref('')
@@ -330,9 +336,14 @@ const totalDone = computed(() => list.value?.groups.reduce((sum, g) => sum + don
 const totalEntries = computed(() => list.value?.groups.reduce((sum, g) => sum + g.entries.length, 0) ?? 0)
 
 async function loadList() {
+  const { consume, focusAndSelect } = useFocusNewItem()
   const result = await call(() => $fetch<ListDetail>(`/api/lists/${listId}`))
   if (result) {
     list.value = result
+    if (consume('list', listId)) {
+      await nextTick()
+      focusAndSelect(titleEl.value)
+    }
   } else {
     router.replace('/')
   }

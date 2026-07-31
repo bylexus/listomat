@@ -29,6 +29,7 @@
             </svg>
           </span>
           <h3
+            :ref="(el) => setGroupNameRef(group.id, el)"
             class="group-name"
             contenteditable="true"
             spellcheck="false"
@@ -138,6 +139,12 @@ const { confirm } = useConfirm()
 const groupList = ref<TemplateGroup[]>([])
 const loading = ref(false)
 const newEntryDrafts = reactive<Record<string, string>>({})
+const groupNameRefs = new Map<string, HTMLElement>()
+
+function setGroupNameRef(id: string, el: any) {
+  if (el) groupNameRefs.set(id, el as HTMLElement)
+  else groupNameRefs.delete(id)
+}
 
 function blurTarget(event: Event) {
   ;(event.target as HTMLElement).blur()
@@ -151,10 +158,16 @@ async function loadTemplates() {
 }
 
 async function addGroup() {
+  const { focusAndSelect } = useFocusNewItem()
   const result = await call(() =>
     $fetch<TemplateGroup>('/api/templates', { method: 'POST', body: { name: t('templates.defaultGroupName') } })
   )
-  if (result) groupList.value.push(result)
+  if (!result) return
+  groupList.value.push(result)
+  // Direkt nach dem Anlegen den Gruppennamen fokussieren, damit der Name
+  // ohne weiteren Klick überschrieben werden kann.
+  await nextTick()
+  focusAndSelect(groupNameRefs.get(result.id))
 }
 
 async function onRenameGroup(group: TemplateGroup, event: FocusEvent) {
