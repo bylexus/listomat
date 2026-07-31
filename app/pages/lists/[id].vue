@@ -65,7 +65,7 @@
       <div v-for="group in list.groups" :key="group.id" class="card group-card">
         <div class="group-card-header">
           <span class="drag-handle group-drag-handle" :title="t('listDetail.dragGroup')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
             </svg>
           </span>
@@ -83,12 +83,12 @@
             :title="t('listDetail.saveAsTemplate')"
             @click="openSaveTemplateDialog(group)"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" stroke-linejoin="round" />
             </svg>
           </button>
           <button class="btn btn-ghost" type="button" :title="t('listDetail.deleteGroup')" @click="confirmDeleteGroup(group)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
@@ -105,7 +105,7 @@
         >
           <div v-for="entry in group.entries" :key="entry.id" class="entry-row">
             <span class="drag-handle entry-drag-handle" :title="t('listDetail.dragEntry')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
               </svg>
             </span>
@@ -146,7 +146,7 @@
               />
             </div>
             <button class="btn btn-ghost entry-delete" type="button" :title="t('listDetail.deleteEntry')" @click="deleteEntry(group, entry)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>
@@ -216,11 +216,11 @@
         <ul v-else class="share-list">
           <li v-for="share in list.shares" :key="share.id" class="share-row">
             <span>{{ share.email }}</span>
-            <button class="btn btn-ghost" type="button" :title="t('listDetail.removeShare')" @click="removeShare(share)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </button>
+              <button class="btn btn-ghost" type="button" :title="t('listDetail.removeShare')" @click="removeShare(share)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
           </li>
         </ul>
       </div>

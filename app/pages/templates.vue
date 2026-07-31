@@ -24,7 +24,7 @@
       <div v-for="group in groupList" :key="group.id" class="card group-card">
         <div class="group-card-header">
           <span class="drag-handle group-drag-handle" :title="t('templates.dragGroup')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
             </svg>
           </span>
@@ -37,7 +37,7 @@
             @keydown.enter.prevent="blurTarget($event)"
           >{{ group.name }}</h3>
           <button class="btn btn-ghost" type="button" :title="t('templates.deleteGroup')" @click="confirmDeleteGroup(group)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path
                 d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"
                 stroke-linecap="round"
@@ -56,7 +56,7 @@
         >
           <div v-for="entry in group.entries" :key="entry.id" class="entry-row">
             <span class="drag-handle entry-drag-handle" :title="t('templates.dragEntry')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
               </svg>
             </span>
@@ -90,7 +90,7 @@
               />
             </div>
             <button class="btn btn-ghost entry-delete" type="button" :title="t('templates.deleteEntry')" @click="deleteEntry(group, entry)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>

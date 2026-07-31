@@ -39,7 +39,7 @@
             <td>
               <div class="row-actions">
                 <button class="btn btn-ghost" type="button" :title="t('admin.editUser')" @click="openEdit(row)">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path
                       d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
                       stroke-linecap="round"
@@ -56,8 +56,8 @@
                 >
                   <svg
                     v-if="row.active"
-                    width="18"
-                    height="18"
+                    width="24"
+                    height="24"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -66,12 +66,12 @@
                     <circle cx="12" cy="12" r="9" />
                     <path d="M4.9 4.9l14.2 14.2" stroke-linecap="round" />
                   </svg>
-                  <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
                 <button class="btn btn-ghost" type="button" :title="t('admin.setPassword')" @click="openPassword(row)">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="8" cy="15" r="4" />
                     <path d="M10.5 12.5 20 3M17 6l2 2M14 9l2 2" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
@@ -83,7 +83,7 @@
                   :title="t('admin.impersonate')"
                   @click="impersonate(row)"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="8" r="4" />
                     <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke-linecap="round" />
                   </svg>

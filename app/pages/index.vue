@@ -28,7 +28,7 @@
                 @keydown.enter.prevent="blurTarget($event)"
               >{{ list.name }}</h3>
               <button class="btn btn-ghost" type="button" :title="t('lists.rename')" @click="focusName(list.id)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path
                     d="M17 3l4 4L8 20l-5 1 1-5L17 3z"
                     stroke-linecap="round"
@@ -37,13 +37,13 @@
                 </svg>
               </button>
               <button class="btn btn-ghost" type="button" :title="t('lists.duplicate')" @click="duplicateList(list)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="12" height="12" rx="2" />
                   <path d="M5 15V5a2 2 0 0 1 2-2h10" stroke-linecap="round" />
                 </svg>
               </button>
               <button class="btn btn-ghost" type="button" :title="t('lists.deleteList')" @click="confirmDeleteList(list)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </button>
@@ -60,7 +60,7 @@
             <div class="list-card-header">
               <h3 class="list-name">{{ list.name }}</h3>
               <button class="btn btn-ghost" type="button" :title="t('lists.duplicate')" @click="duplicateList(list)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="12" height="12" rx="2" />
                   <path d="M5 15V5a2 2 0 0 1 2-2h10" stroke-linecap="round" />
                 </svg>
