@@ -7,7 +7,12 @@
     "templates": "Templates",
     "admin": "Administration",
     "logout": "Logout",
-    "menu": "Menu"
+    "menu": "Menu",
+    "about": "About"
+  },
+  "about": {
+    "title": "About",
+    "description": "Listomat helps you create, manage, and share checklists."
   },
   "auth": {
     "email": "Email",

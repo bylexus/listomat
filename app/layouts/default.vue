@@ -31,6 +31,7 @@
               <option v-for="l in availableLocales" :key="l.code" :value="l.code">{{ l.name }}</option>
             </select>
           </label>
+          <NuxtLink to="/about" class="btn btn-ghost app-menu-item" role="menuitem" @click="closeMenu">{{ t('nav.about') }}</NuxtLink>
           <button
             v-if="loggedIn"
             class="btn btn-ghost app-menu-item"
@@ -161,7 +162,11 @@ onBeforeUnmount(() => {
   width: 100%;
 }
 .app-menu-item {
+  display: flex;
+  align-items: center;
   justify-content: flex-start;
+  color: inherit;
+  text-decoration: none;
 }
 .app-main {
   flex: 1;

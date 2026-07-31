@@ -7,7 +7,12 @@
     "templates": "Vorlagen",
     "admin": "Administration",
     "logout": "Abmelden",
-    "menu": "Menü"
+    "menu": "Menü",
+    "about": "Über"
+  },
+  "about": {
+    "title": "Über",
+    "description": "Listomat hilft dir, Checklisten zu erstellen, zu verwalten und zu teilen."
   },
   "auth": {
     "email": "E-Mail",
