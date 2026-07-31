@@ -14,37 +14,23 @@
 
       <div class="toolbar">
         <button class="btn btn-primary" type="button" @click="openGroupDialog">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M5 12h14" stroke-linecap="round" />
-          </svg>
+          <Plus :width="16" :height="16" />
           {{ t('listDetail.newGroup') }}
         </button>
         <button class="btn" type="button" :title="t('listDetail.reset')" @click="confirmReset">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
+          <Reset :width="16" :height="16" />
           {{ t('listDetail.reset') }}
         </button>
         <button class="btn" type="button" :title="t('listDetail.duplicate')" @click="duplicateList">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="9" y="9" width="12" height="12" rx="2" />
-            <path d="M5 15V5a2 2 0 0 1 2-2h10" stroke-linecap="round" />
-          </svg>
+          <Duplicate :width="16" :height="16" />
           {{ t('listDetail.duplicate') }}
         </button>
         <button class="btn" type="button" :title="t('listDetail.export')" @click="openExportDialog">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 3v12M7 10l5 5 5-5M5 21h14" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
+          <ExportIcon :width="16" :height="16" />
           {{ t('listDetail.export') }}
         </button>
         <button v-if="list.isOwner" class="btn" type="button" :title="t('listDetail.share')" @click="openShareDialog">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="18" cy="5" r="3" />
-            <circle cx="6" cy="12" r="3" />
-            <circle cx="18" cy="19" r="3" />
-            <path d="M8.6 10.6l6.8-3.2M8.6 13.4l6.8 3.2" />
-          </svg>
+          <Share :width="16" :height="16" />
           {{ t('listDetail.share') }}
         </button>
       </div>
@@ -65,9 +51,7 @@
       <div v-for="group in list.groups" :key="group.id" class="card group-card">
         <div class="group-card-header">
           <span class="drag-handle group-drag-handle" :title="t('listDetail.dragGroup')">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
-            </svg>
+            <DragHandle />
           </span>
           <h3
             class="group-name"
@@ -83,14 +67,10 @@
             :title="t('listDetail.saveAsTemplate')"
             @click="openSaveTemplateDialog(group)"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" stroke-linejoin="round" />
-            </svg>
+            <Bookmark />
           </button>
           <button class="btn btn-ghost" type="button" :title="t('listDetail.deleteGroup')" @click="confirmDeleteGroup(group)">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
+            <Trash />
           </button>
         </div>
 
@@ -105,9 +85,7 @@
         >
           <div v-for="entry in group.entries" :key="entry.id" class="entry-row">
             <span class="drag-handle entry-drag-handle" :title="t('listDetail.dragEntry')">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
-              </svg>
+              <DragHandle />
             </span>
             <input
               type="checkbox"
@@ -146,9 +124,7 @@
               />
             </div>
             <button class="btn btn-ghost entry-delete" type="button" :title="t('listDetail.deleteEntry')" @click="deleteEntry(group, entry)">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
+              <Trash />
             </button>
           </div>
         </VueDraggable>
@@ -217,9 +193,7 @@
           <li v-for="share in list.shares" :key="share.id" class="share-row">
             <span>{{ share.email }}</span>
               <button class="btn btn-ghost" type="button" :title="t('listDetail.removeShare')" @click="removeShare(share)">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
+                <Trash />
               </button>
           </li>
         </ul>
@@ -264,6 +238,14 @@
 
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
+import Bookmark from '~/assets/icons/Bookmark.vue'
+import DragHandle from '~/assets/icons/DragHandle.vue'
+import Duplicate from '~/assets/icons/Duplicate.vue'
+import ExportIcon from '~/assets/icons/Export.vue'
+import Plus from '~/assets/icons/Plus.vue'
+import Reset from '~/assets/icons/Reset.vue'
+import Share from '~/assets/icons/Share.vue'
+import Trash from '~/assets/icons/Trash.vue'
 
 interface ListEntry {
   id: string

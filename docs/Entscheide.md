@@ -45,6 +45,14 @@ Ergänzungen und Präzisierungen zu `Planung.md`. Bei Widerspruch gilt dieses Do
 - Keine CSS-Frameworks (kein Tailwind, kein Bootstrap). Kein zusätzliches npm-Paket für UI.
 - `vue-draggable-plus` bleibt für Drag'n'drop (unabhängig von PrimeVue).
 
+### Icons
+
+- Inline-SVGs werden in eigenständige Vue-Komponenten unter `app/assets/icons/` extrahiert (je ein Icon pro Datei, PascalCase: `Plus.vue`, `Trash.vue`, `DragHandle.vue`, `Duplicate.vue`, `Edit.vue`, `EditUser.vue`, `Reset.vue`, `Export.vue`, `Share.vue`, `Bookmark.vue`, `Ban.vue`, `Check.vue`, `Key.vue`, `User.vue`).
+- Konsistente Attribute: `viewBox="0 0 24 24"`, `fill="none"`, `stroke="currentColor"`, `stroke-width="2"`. Stroke-Linienenden werden pro Icon so übernommen, wie sie vorher inline definiert waren.
+- Jede Icon-Komponente akzeptiert die Props `width` und `height` (Number, Default 24). Konsumenten setzen `:width="16" :height="16"` an Stellen, wo das Icon neben Text in einem Toolbar-Button sitzt.
+- Verwendet werden die Komponenten per explizitem Import im jeweiligen `<script setup>` (kein Wrapper, kein globales Auto-Import aus `app/components/`). Dadurch ergibt sich Tree-Shaking und der Aufruf-Site-Typ passt zu den Vue-Standards.
+- Keine zusätzliche Library, keine `UiIcon`-Abstraktionsschicht.
+
 ## Export
 
 - **PDF**: serverseitig mit leichtgewichtiger PDF-Library (pdfkit o.ä., kein Puppeteer/Chromium). Layout wird eigenständig gestaltet, keine 1:1-HTML-Abbildung. Sortierung wie in der Oberfläche.

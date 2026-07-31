@@ -281,7 +281,7 @@ Kein UI-Framework. Verbindliche Bausteine:
 - **useConfirm.ts**: Promise-basiert. `confirm(message: string): Promise<boolean>`. Globaler State (`useState`) mit `{ message, resolve }`; `UiConfirm.vue` liest diesen State und ruft `resolve(true/false)` beim Buttonklick.
 
 ### Icons
-- Wenige inline SVGs direkt in den Templates (24×24 viewBox, `stroke="currentColor"`, `fill="none"`): Stift, Papierkorb, Plus, Teilen, Export/Download, Duplizieren, Reset, Drag-Handle (≡), Schliessen (×), Logout. Kein Icon-Paket, keine `UiIcon`-Abstraktion nötig; bei Wiederverwendung als kleine Komponente extrahieren ist erlaubt.
+- Inline-SVGs sind in eigenständige Vue-Komponenten unter `app/assets/icons/` extrahiert (eine Datei pro Icon, PascalCase). Verwendung per explizitem Import in den jeweiligen `<script setup>`-Blöcken, keine globale Registrierung, keine `UiIcon`-Abstraktion. Attribute pro Komponente: `viewBox="0 0 24 24"`, `fill="none"`, `stroke="currentColor"`, `stroke-width="2"`. Props: `width` und `height` (Number, Default 24). Konkrete Icons: `Plus`, `Trash`, `DragHandle`, `Duplicate`, `Edit`, `EditUser`, `Reset`, `Export`, `Share`, `Bookmark`, `Ban`, `Check`, `Key`, `User`.
 
 ## UI
 
